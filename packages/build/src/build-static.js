@@ -13,18 +13,23 @@ await cp(path.join(root, 'dist'), path.join(root, 'dist2'), {
 
 const { commitHash } = await exportStatic({
   extensionPath: 'packages/extension',
-  testPath: 'packages/e2e',
   root,
 })
 
 await cp(
   path.join(root, 'dist2'),
-  path.join(root, 'dist', commitHash, 'extensions', 'builtin.prettier'),
+  path.join(
+    root,
+    'dist',
+    commitHash,
+    'extensions',
+    'builtin.heap-snapshot-viewer',
+  ),
   { recursive: true, force: true },
 )
 
 await replace({
   path: path.join(root, 'dist', commitHash, 'config', 'webExtensions.json'),
-  occurrence: 'src/prettierMain.ts',
-  replacement: 'dist/prettierMain.js',
+  occurrence: 'src/heapSnapshotViewerMain.ts',
+  replacement: 'dist/heapSnapshotViewerMain.js',
 })
