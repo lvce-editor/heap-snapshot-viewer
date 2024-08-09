@@ -1,24 +1,8 @@
 {
-  "id": "builtin.prettier",
-  "name": "Prettier",
-  "description": "Code formatter using prettier",
-  "browser": "src/prettierMain.ts",
-  "icon": "./icon.png",
-  "activation": [
-    "onFormatting:css",
-    "onFormatting:json",
-    "onFormatting:javascript",
-    "onFormatting:typescript",
-    "onFormatting:html"
-  ],
-  "languages": [
-    {
-      "id": "json",
-      "fileNames": [".prettierrc"]
-    },
-    {
-      "id": "ignore",
-      "fileNames": [".prettierignore"]
-    }
-  ]
+  "id": "builtin.heap-snapshot-viewer",
+  "name": "Heap Snapshot Viewer",
+  "description": "Heap Snapshot Viewer",
+  "browser": "src/heapSnapshotViewerMain.ts",
+  "activation": [],
+  "languages": []
 }
