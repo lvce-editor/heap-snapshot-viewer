@@ -8,7 +8,7 @@ import path, { join } from 'node:path'
 import { root } from './root.js'
 
 const extension = path.join(root, 'packages', 'extension')
-const prettierWorker = path.join(root, 'packages', 'prettier-worker')
+const heapSnapshotWorker = path.join(root, 'packages', 'heap-snapshot-worker')
 
 fs.rmSync(join(root, 'dist'), { recursive: true, force: true })
 
@@ -27,7 +27,6 @@ fs.writeFileSync(
   JSON.stringify(packageJson, null, 2) + '\n',
 )
 fs.copyFileSync(join(root, 'README.md'), join(root, 'dist', 'README.md'))
-fs.copyFileSync(join(extension, 'icon.png'), join(root, 'dist', 'icon.png'))
 fs.copyFileSync(
   join(extension, 'extension.json'),
   join(root, 'dist', 'extension.json'),
@@ -36,107 +35,40 @@ fs.cpSync(join(extension, 'src'), join(root, 'dist', 'src'), {
   recursive: true,
 })
 
-fs.mkdirSync(
-  join(root, 'dist', 'prettier-worker', 'third_party', 'prettier', 'plugins'),
-  {
-    recursive: true,
-  },
-)
-for (const file of ['standalone.mjs', 'README.md', 'LICENSE', 'package.json']) {
-  fs.cpSync(
-    join(root, 'node_modules', 'prettier', file),
-    join(root, 'dist', 'prettier-worker', 'third_party', 'prettier', file),
-    {
-      recursive: true,
-    },
-  )
-}
-const dirents = fs.readdirSync(
-  join(root, 'node_modules', 'prettier', 'plugins'),
-)
-for (const dirent of dirents) {
-  if (dirent.endsWith('.mjs')) {
-    fs.cpSync(
-      join(root, 'node_modules', 'prettier', 'plugins', dirent),
-      join(
-        root,
-        'dist',
-        'prettier-worker',
-        'third_party',
-        'prettier',
-        'plugins',
-        dirent,
-      ),
-    )
-  }
-}
 fs.cpSync(
-  join(prettierWorker, 'src'),
-  join(root, 'dist', 'prettier-worker', 'src'),
+  join(heapSnapshotWorker, 'src'),
+  join(root, 'dist', 'heap-snapshot-worker', 'src'),
   {
     recursive: true,
   },
 )
-
-const assetDirPath = path.join(
-  root,
-  'dist',
-  'src',
-  'parts',
-  'AssetDir',
-  'AssetDir.ts',
-)
-
-await replace({
-  path: assetDirPath,
-  occurrence: '../../../../',
-  replacement: '../',
-})
-
-const workerUrlFilePath = path.join(
-  root,
-  'dist',
-  'src',
-  'parts',
-  'PrettierWorkerUrl',
-  'PrettierWorkerUrl.ts',
-)
-await replace({
-  path: workerUrlFilePath,
-  occurrence: 'src/prettierWorkerMain.ts',
-  replacement: 'dist/prettierWorkerMain.js',
-})
-
-const modulePath = path.join(
-  root,
-  'dist',
-  'prettier-worker',
-  'src',
-  'parts',
-  'PrettierModule',
-  'PrettierModule.ts',
-)
-
-await replace({
-  path: modulePath,
-  occurrence: '../../../../../node_modules/prettier',
-  replacement: '../third_party/prettier',
-})
 
 await replace({
   path: join(root, 'dist', 'extension.json'),
-  occurrence: 'src/prettierMain.ts',
-  replacement: 'dist/prettierMain.js',
+  occurrence: 'src/heapSnapshotViewerMain.ts',
+  replacement: 'dist/heapSnapshotViewerMain.js',
 })
 
 await bundleJs(
-  join(root, 'dist', 'prettier-worker', 'src', 'prettierWorkerMain.ts'),
-  join(root, 'dist', 'prettier-worker', 'dist', 'prettierWorkerMain.js'),
+  join(
+    root,
+    'dist',
+    'heap-snapshot-worker',
+    'src',
+    'heapSnapshotWorkerMain.ts',
+  ),
+  join(
+    root,
+    'dist',
+    'heap-snapshot-worker',
+    'dist',
+    'heapSnapshotWorkerMain.js',
+  ),
 )
 
 await bundleJs(
-  join(root, 'dist', 'src', 'prettierMain.ts'),
-  join(root, 'dist', 'dist', 'prettierMain.js'),
+  join(root, 'dist', 'src', 'heapSnapshotViewerMain.ts'),
+  join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js'),
 )
 
 await packageExtension({
