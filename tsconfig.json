@@ -2,10 +2,8 @@
   "files": [],
   "include": [],
   "references": [
-    { "path": "./packages/e2e" },
     { "path": "./packages/extension" },
-    { "path": "./packages/integration" },
-    { "path": "./packages/prettier-worker" },
+    { "path": "./packages/heap-snapshot-worker" },
     { "path": "./packages/build" }
   ]
 }
