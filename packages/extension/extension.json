@@ -1,0 +1,8 @@
+{
+  "id": "builtin.heap-snapshot-viewer",
+  "name": "Heap Snapshot Viewer",
+  "description": "Heap Snapshot Viewer",
+  "browser": "src/heapSnapshotViewerMain.ts",
+  "activation": [],
+  "languages": []
+}
