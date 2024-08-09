@@ -1,0 +1,24 @@
+{
+  "id": "builtin.prettier",
+  "name": "Prettier",
+  "description": "Code formatter using prettier",
+  "browser": "src/prettierMain.ts",
+  "icon": "./icon.png",
+  "activation": [
+    "onFormatting:css",
+    "onFormatting:json",
+    "onFormatting:javascript",
+    "onFormatting:typescript",
+    "onFormatting:html"
+  ],
+  "languages": [
+    {
+      "id": "json",
+      "fileNames": [".prettierrc"]
+    },
+    {
+      "id": "ignore",
+      "fileNames": [".prettierignore"]
+    }
+  ]
+}
