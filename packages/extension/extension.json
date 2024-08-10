@@ -4,5 +4,11 @@
   "description": "Heap Snapshot Viewer",
   "browser": "src/heapSnapshotViewerMain.ts",
   "activation": [],
-  "languages": []
+  "languages": [],
+  "views": [
+    {
+      "id": "builtin.heap-snapshot-viewer",
+      "uri": "media/index.html"
+    }
+  ]
 }
