@@ -1,6 +1,8 @@
 const webViewProvider = {
   id: 'builtin.heap-snapshot-viewer',
-  async create() {},
+  async create(webView) {
+    console.log({ webView })
+  },
   async open(uri, webView) {
     // const content = await vscode.readFile(uri)
     // webView.postMessage({
