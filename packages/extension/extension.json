@@ -5,7 +5,7 @@
   "browser": "src/heapSnapshotViewerMain.ts",
   "activation": [],
   "languages": [],
-  "views": [
+  "webViews": [
     {
       "id": "builtin.heap-snapshot-viewer",
       "rpc": true,
