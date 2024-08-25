@@ -8,7 +8,8 @@
   "views": [
     {
       "id": "builtin.heap-snapshot-viewer",
-      "uri": "media/index.html"
+      "rpc": true,
+      "path": "media/index.html"
     }
   ]
 }
