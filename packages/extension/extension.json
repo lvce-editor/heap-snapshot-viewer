@@ -9,7 +9,8 @@
     {
       "id": "builtin.heap-snapshot-viewer",
       "rpc": true,
-      "path": "media/index.html"
+      "path": "media/index.html",
+      "selector": [".heapsnapshot"]
     }
   ]
 }
