@@ -3,7 +3,7 @@
   "name": "Heap Snapshot Viewer",
   "description": "Heap Snapshot Viewer",
   "browser": "src/heapSnapshotViewerMain.ts",
-  "activation": [],
+  "activation": ["onWebView:builtin.heap-snapshot-viewer"],
   "languages": [],
   "webViews": [
     {
