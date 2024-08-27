@@ -1,3 +1,7 @@
-const rpc = globalThis.lvceRpc({})
-
-console.log('did load index js')
+const rpc = globalThis.lvceRpc({
+  setContent(content) {
+    const pre = document.createElement('pre')
+    pre.textContent = content
+    document.body.append(pre)
+  },
+})
