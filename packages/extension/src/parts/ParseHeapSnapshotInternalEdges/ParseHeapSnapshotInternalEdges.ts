@@ -1,7 +1,13 @@
-import * as Assert from '../Assert/Assert.js'
-import * as ParseHeapSnapshotInternalObjects from '../ParseHeapSnapshotInternalObjects/ParseHeapSnapshotInternalObjects.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as ParseHeapSnapshotInternalObjects from '../ParseHeapSnapshotInternalObjects/ParseHeapSnapshotInternalObjects.ts'
 
-export const parseHeapSnapshotInternalEdges = (edges, edgeFields, edgeTypes, nodeFieldCount, strings) => {
+export const parseHeapSnapshotInternalEdges = (
+  edges,
+  edgeFields,
+  edgeTypes,
+  nodeFieldCount,
+  strings,
+) => {
   Assert.array(edges)
   Assert.array(edgeFields)
   Assert.array(edgeTypes)
