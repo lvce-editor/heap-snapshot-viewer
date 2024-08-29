@@ -7,6 +7,7 @@ export const parseHeapSnapshot = (content: string) => {
   const { snapshot, nodes, edges, strings } = heapsnapshot
   const { meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
+  console.time('parse')
   const parsed = ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,
     node_fields,
@@ -16,5 +17,6 @@ export const parseHeapSnapshot = (content: string) => {
     edge_types[0],
     strings,
   )
+  console.timeEnd('parse')
   return parsed
 }
