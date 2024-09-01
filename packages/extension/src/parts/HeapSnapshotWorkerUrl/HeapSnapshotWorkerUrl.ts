@@ -1,3 +1,3 @@
 import * as AssetDir from '../AssetDir/AssetDir.ts'
 
-export const heapSnapshotWorkerUrl = `${AssetDir.assetDir}/json-worker/src/jsonWorkerMain.ts`
+export const heapSnapshotWorkerUrl = `${AssetDir.assetDir}/heap-snapshot-worker/src/heapSnapshotWorkerMain.ts`
