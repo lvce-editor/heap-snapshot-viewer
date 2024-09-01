@@ -3,3 +3,28 @@
   width: 200px;
   height: 200px;
 }
+
+.Table {
+  contain: content;
+}
+
+.TableHeader {
+  contain: content;
+}
+
+.TableHeaderRow {
+  contain: content;
+}
+
+.TableBodyRow {
+  contain: content;
+}
+
+.TableCell {
+  contain: content;
+}
+
+.CountLabel {
+  font-size: 10px;
+  margin-left: 10px;
+}
