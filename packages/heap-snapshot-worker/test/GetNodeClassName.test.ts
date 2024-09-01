@@ -36,10 +36,26 @@ test('string node', () => {
   expect(GetNodeClassName.getNodeClassName(node)).toBe('(string)')
 })
 
+test('object node', () => {
+  const node = {
+    type: 'object',
+    name: 'test',
+  }
+  expect(GetNodeClassName.getNodeClassName(node)).toBe('test')
+})
+
+test('native node', () => {
+  const node = {
+    type: 'native',
+    name: 'test',
+  }
+  expect(GetNodeClassName.getNodeClassName(node)).toBe('test')
+})
+
 test('custom node', () => {
   const node = {
     type: 'other',
     name: 'test',
   }
-  expect(GetNodeClassName.getNodeClassName(node)).toBe('test')
+  expect(GetNodeClassName.getNodeClassName(node)).toBe('(other)')
 })

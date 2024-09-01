@@ -12,7 +12,10 @@ export const getNodeClassName = (node) => {
       return 'Function'
     case NodeType.String:
       return '(string)'
-    default:
+    case NodeType.Native:
+    case NodeType.Object:
       return node.name
+    default:
+      return `(${node.type})`
   }
 }
