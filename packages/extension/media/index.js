@@ -1,6 +1,25 @@
+const handleInput = async (event) => {
+  const { target } = event
+  const { value } = target
+  console.log('before invoke')
+  await rpc.invoke('handleInput', value)
+  console.log('after invoke')
+}
+
 const setContent = (parsedNodes) => {
-  // const overview = document.createElement('ul')
-  // overview.className = 'Overview'
+  const app = document.createElement('div')
+  app.className = 'App'
+
+  const header = document.createElement('header')
+  header.className = 'Header'
+
+  const filterInput = document.createElement('input')
+  filterInput.className = 'FilterInput'
+  filterInput.placeholder = 'Filter'
+  filterInput.addEventListener('input', handleInput)
+  header.append(filterInput)
+  app.append(header)
+
   const table = document.createElement('table')
   table.className = 'Table'
 
@@ -36,7 +55,9 @@ const setContent = (parsedNodes) => {
     tbody.append(tr)
   }
   table.append(tbody)
-  document.body.append(table)
+  app.append(table)
+
+  document.body.append(app)
   // const pre = document.createElement('pre')
   // pre.className = 'HeapSnapshotView'
   // const stringified = JSON.stringify(parsedNodes, null, 2)
