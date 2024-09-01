@@ -22,6 +22,9 @@ fs.copyFileSync(join(extension, 'extension.json'), join(root, 'dist', 'extension
 fs.cpSync(join(extension, 'src'), join(root, 'dist', 'src'), {
   recursive: true,
 })
+fs.cpSync(join(extension, 'media'), join(root, 'dist', 'media'), {
+  recursive: true,
+})
 
 fs.cpSync(join(heapSnapshotWorker, 'src'), join(root, 'dist', 'heap-snapshot-worker', 'src'), {
   recursive: true,
