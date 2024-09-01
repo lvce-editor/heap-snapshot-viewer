@@ -61,6 +61,7 @@ const initialize = (parsedNodes) => {
 
   const filterInput = document.createElement('input')
   filterInput.className = 'FilterInput'
+  filterInput.name = 'FilterInput'
   filterInput.placeholder = 'Filter'
   filterInput.addEventListener('input', handleInput)
   header.append(filterInput)
