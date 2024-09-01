@@ -39,6 +39,7 @@ test('getAggregatesByClassName', async () => {
   const promiseCount = findClassCount(aggregates, 'Promise')
   const typedArrayCount = findClassCount(aggregates, 'TypedArray')
   const heapNumberCount = findClassCount(aggregates, 'heap number')
+  const vErrorCount = findClassCount(aggregates, 'VError')
 
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
@@ -57,4 +58,5 @@ test('getAggregatesByClassName', async () => {
   expect(promiseCount).toBe(4)
   expect(typedArrayCount).toBe(22)
   expect(heapNumberCount).toBe(25)
+  expect(vErrorCount).toBe(1)
 })
