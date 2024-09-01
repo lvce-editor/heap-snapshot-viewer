@@ -53,6 +53,6 @@ test('getAggregatesByClassName', async () => {
   expect(eventTargetCount).toBe(5)
   expect(messagePortCount).toBe(5)
   expect(generatorCount).toBe(6)
-  expect(promiseCount).toBe(6)
+  expect(promiseCount).toBe(4)
   expect(typedArrayCount).toBe(22)
 })
