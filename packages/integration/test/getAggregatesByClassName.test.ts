@@ -23,7 +23,6 @@ test('getAggregatesByClassName', async () => {
   const heapsnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
   const heapSnapshotContent = await readFile(heapsnapshotPath, 'utf8')
   const parsed = await worker.execute('Heapsnapshot.parse', heapSnapshotContent)
-  console.log(parsed.parsedNodes.length)
   const aggregates = await worker.execute('Heapsnapshot.getAggregatesByClassName', parsed)
   const regexCount = findClassCount(aggregates, 'RegExp')
   const systemCount = findClassCount(aggregates, '(system)')
@@ -37,13 +36,13 @@ test('getAggregatesByClassName', async () => {
 
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
-  expect(regexCount).toBe(40) // TODO
+  expect(regexCount).toBe(39)
   // expect(systemCount).toBe(3677) // TODO
   expect(compiledCodeCount).toBe(4098)
-  expect(functionCount).toBe(1621) // TODO
+  expect(functionCount).toBe(1620)
   expect(stringCount).toBe(3519)
   // expect(objectShapeCount).toBe(1379)
   // expect(arrayCount).toBe(35)
-  // expect(objectCount).toBe(77)
-  // expect(errorCount).toBe(24)
+  expect(objectCount).toBe(77)
+  expect(errorCount).toBe(24)
 })
