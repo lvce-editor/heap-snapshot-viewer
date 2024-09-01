@@ -29,6 +29,11 @@ const webViewProvider = {
     //   params: [content],
     // })
   },
+  commands: {
+    handleInput(text) {
+      console.log('input', text)
+    },
+  },
 }
 
 export const activate = () => {
