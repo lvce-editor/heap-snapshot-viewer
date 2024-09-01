@@ -33,16 +33,26 @@ test('getAggregatesByClassName', async () => {
   const arrayCount = findClassCount(aggregates, '(array)')
   const objectCount = findClassCount(aggregates, 'Object')
   const errorCount = findClassCount(aggregates, 'Error')
+  const eventTargetCount = findClassCount(aggregates, 'EventTarget')
+  const messagePortCount = findClassCount(aggregates, 'MessagePort')
+  const generatorCount = findClassCount(aggregates, 'Generator')
+  const promiseCount = findClassCount(aggregates, 'Promise')
+  const typedArrayCount = findClassCount(aggregates, 'TypedArray')
 
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
-  expect(regexCount).toBe(40) // TODO
+  expect(regexCount).toBe(39)
   // expect(systemCount).toBe(3677) // TODO
   expect(compiledCodeCount).toBe(4098)
-  expect(functionCount).toBe(1621) // TODO
-  // expect(stringCount).toBe(3519)
+  expect(functionCount).toBe(1620)
+  expect(stringCount).toBe(3519)
   // expect(objectShapeCount).toBe(1379)
   // expect(arrayCount).toBe(35)
-  // expect(objectCount).toBe(77)
-  // expect(errorCount).toBe(24)
+  expect(objectCount).toBe(77)
+  expect(errorCount).toBe(24)
+  expect(eventTargetCount).toBe(5)
+  expect(messagePortCount).toBe(5)
+  expect(generatorCount).toBe(6)
+  expect(promiseCount).toBe(4)
+  expect(typedArrayCount).toBe(22)
 })

@@ -10,6 +10,8 @@ export const getNodeClassName = (node) => {
       return 'RegExp'
     case NodeType.Closure:
       return 'Function'
+    case NodeType.String:
+      return '(string)'
     default:
       return node.name
   }
