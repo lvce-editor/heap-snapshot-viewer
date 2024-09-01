@@ -13,6 +13,7 @@
   contain: content;
   font-family: var(--FontFamily);
   cursor: default;
+  margin-top: 10px;
 }
 
 .TableHeader {
@@ -21,6 +22,10 @@
 
 .TableHeaderRow {
   contain: content;
+}
+
+.TableHeaderCell {
+  text-align: left;
 }
 
 .TableBodyRow:where(:hover) {
