@@ -34,6 +34,13 @@ await replace({
   replacement: 'dist/heapSnapshotWorkerMain.js',
 })
 
+const assetDirPath = path.join(root, 'dist', 'src', 'parts', 'AssetDir', 'AssetDir.ts')
+await replace({
+  path: assetDirPath,
+  occurrence: '../../../../',
+  replacement: '../',
+})
+
 await replace({
   path: join(root, 'dist', 'extension.json'),
   occurrence: 'src/heapSnapshotViewerMain.ts',
