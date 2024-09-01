@@ -33,6 +33,8 @@ test('getAggregatesByClassName', async () => {
   const arrayCount = findClassCount(aggregates, '(array)')
   const objectCount = findClassCount(aggregates, 'Object')
   const errorCount = findClassCount(aggregates, 'Error')
+  const eventTargetCount = findClassCount(aggregates, 'EventTarget')
+  const messagePortCount = findClassCount(aggregates, 'MessagePort')
 
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
@@ -45,4 +47,6 @@ test('getAggregatesByClassName', async () => {
   // expect(arrayCount).toBe(35)
   expect(objectCount).toBe(77)
   expect(errorCount).toBe(24)
+  expect(eventTargetCount).toBe(5)
+  expect(messagePortCount).toBe(5)
 })
