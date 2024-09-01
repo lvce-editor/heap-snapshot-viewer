@@ -1,3 +1,5 @@
+import * as GetNodeClassName from '../GetNodeClassName/GetNodeClassName.ts'
+
 const toSorted = (items, compare) => {
   return [...items].sort(compare)
 }
@@ -7,11 +9,11 @@ const compareCount = (a, b) => {
 }
 
 export const getAggregratesByClassName = (parsed) => {
-  console.log(parsed)
   const { parsedNodes } = parsed
   const countMap = Object.create(null)
+  console.log({ parsedNodes })
   for (const node of parsedNodes) {
-    const { name } = node
+    const name = GetNodeClassName.getNodeClassName(node)
     countMap[name] ||= 0
     countMap[name]++
   }
