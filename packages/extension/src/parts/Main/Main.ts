@@ -38,9 +38,9 @@ const webViewProvider = {
   commands: {
     async handleInput(text) {
       // @ts-ignore
-      const aggregates = this.aggregates
+      const aggregates = webViewProvider.aggregates
       // @ts-ignore
-      const webView = this.webView
+      const webView = webViewProvider.webView
       const filtered = FilterAggregates.filterAggregates(aggregates, text)
       await webView.invoke('setContent', filtered)
     },

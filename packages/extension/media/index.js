@@ -65,12 +65,11 @@ const initialize = (parsedNodes) => {
   filterInput.addEventListener('input', handleInput)
   header.append(filterInput)
   app.append(header)
-
-  setContent(parsedNodes)
-
   document.body.append(app)
+  setContent(parsedNodes)
 }
 
 const rpc = globalThis.lvceRpc({
-  setContent: initialize,
+  initialize,
+  setContent,
 })
