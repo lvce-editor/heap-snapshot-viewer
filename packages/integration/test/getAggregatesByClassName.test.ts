@@ -40,6 +40,7 @@ test('getAggregatesByClassName', async () => {
   const typedArrayCount = findClassCount(aggregates, 'TypedArray')
   const heapNumberCount = findClassCount(aggregates, 'heap number')
   const vErrorCount = findClassCount(aggregates, 'VError')
+  const webAssemblyModuleCount = findClassCount(aggregates, 'WebAssembly Module')
 
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
@@ -59,4 +60,5 @@ test('getAggregatesByClassName', async () => {
   expect(typedArrayCount).toBe(22)
   expect(heapNumberCount).toBe(25)
   expect(vErrorCount).toBe(1)
+  expect(webAssemblyModuleCount).toBe(2)
 })
