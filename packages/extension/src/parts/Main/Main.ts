@@ -17,8 +17,7 @@ const webViewProvider = {
     // TODO use heapsnapshot worker to parse heapsnapshot
     const parsed = ParseHeapSnapshot.parseHeapSnapshot(content)
     console.time('aggregate')
-    const aggregrates =
-      GetAggregatesByClassName.getAggregratesByClassName(parsed)
+    const aggregrates = GetAggregatesByClassName.getAggregratesByClassName(parsed)
     console.timeEnd('aggregate')
     await webView.invoke('initialize', aggregrates)
     // TODO support connecting state to webview

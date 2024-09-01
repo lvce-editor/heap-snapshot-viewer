@@ -1,1 +1,1 @@
-console.log('hello from heap snapshot worker')
+export * from './parts/Main/Main.ts'
