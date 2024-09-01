@@ -1,3 +1,8 @@
+:root {
+  --TableRowHoverBackground: rgb(224, 224, 224);
+  --FontFamily: sans-serif;
+}
+
 .HeapSnapshotView {
   contain: strict;
   width: 200px;
@@ -6,6 +11,8 @@
 
 .Table {
   contain: content;
+  font-family: var(--FontFamily);
+  cursor: default;
 }
 
 .TableHeader {
@@ -14,6 +21,10 @@
 
 .TableHeaderRow {
   contain: content;
+}
+
+.TableBodyRow:where(:hover) {
+  background: var(--TableRowHoverBackground);
 }
 
 .TableBodyRow {
@@ -25,6 +36,6 @@
 }
 
 .CountLabel {
-  font-size: 10px;
+  font-size: 15px;
   margin-left: 10px;
 }
