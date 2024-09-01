@@ -11,7 +11,6 @@ const compareCount = (a, b) => {
 export const getAggregratesByClassName = (parsed) => {
   const { parsedNodes } = parsed
   const countMap = Object.create(null)
-  console.log({ parsedNodes })
   for (const node of parsedNodes) {
     const name = GetNodeClassName.getNodeClassName(node)
     countMap[name] ||= 0

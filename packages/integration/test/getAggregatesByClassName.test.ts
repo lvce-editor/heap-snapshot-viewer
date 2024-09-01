@@ -1,16 +1,48 @@
-import { test } from '@jest/globals'
+import { test, expect } from '@jest/globals'
+import { readFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { testWorker } from '../src/testWorker.ts'
 
-test.skip('getAggregetsByClassName', async () => {
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const findClassCount = (aggregates: any, className: string) => {
+  for (const item of aggregates) {
+    if (item.name === className) {
+      return item.count
+    }
+  }
+  return 0
+}
+
+test('getAggregatesByClassName', async () => {
   const execMap = {}
   const worker = await testWorker({
     execMap,
   })
-  const offset = 10
-  const textDocument = {
-    uri: 'test://test.json',
-    text: `{ "type":  }`,
-  }
-  const parsed = await worker.execute('Heapsnapshot.parse', textDocument, offset)
-  console.log({ parsed })
+  const heapsnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
+  const heapSnapshotContent = await readFile(heapsnapshotPath, 'utf8')
+  const parsed = await worker.execute('Heapsnapshot.parse', heapSnapshotContent)
+  const aggregates = await worker.execute('Heapsnapshot.getAggregatesByClassName', parsed)
+  const regexCount = findClassCount(aggregates, 'RegExp')
+  const systemCount = findClassCount(aggregates, '(system)')
+  const compiledCodeCount = findClassCount(aggregates, '(compiled code)')
+  const functionCount = findClassCount(aggregates, 'Function')
+  const stringCount = findClassCount(aggregates, '(string)')
+  const objectShapeCount = findClassCount(aggregates, '(object shape)')
+  const arrayCount = findClassCount(aggregates, '(array)')
+  const objectCount = findClassCount(aggregates, 'Object')
+  const errorCount = findClassCount(aggregates, 'Error')
+
+  // for testing, compare how these numbers are displayed
+  // in the chrome devtools heapsnapshot viewer
+  expect(regexCount).toBe(40) // TODO
+  // expect(systemCount).toBe(3677) // TODO
+  expect(compiledCodeCount).toBe(4098)
+  expect(functionCount).toBe(1621) // TODO
+  // expect(stringCount).toBe(3519)
+  // expect(objectShapeCount).toBe(1379)
+  // expect(arrayCount).toBe(35)
+  // expect(objectCount).toBe(77)
+  // expect(errorCount).toBe(24)
 })
