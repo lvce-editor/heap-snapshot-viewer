@@ -1,4 +1,5 @@
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggregatesByClassName.ts'
 
 // TODO for best performance:
 // 1. create heapsnapshot worker
@@ -12,9 +13,13 @@ const webViewProvider = {
   async create(webView, uri) {
     // @ts-ignore
     const content = await vscode.readFile(uri)
+    // TODO use heapsnapshot worker to parse heapsnapshot
     const parsed = ParseHeapSnapshot.parseHeapSnapshot(content)
-    console.log({ parsed })
-    await webView.invoke('setContent', content)
+    console.time('aggregate')
+    const aggregrates =
+      GetAggregatesByClassName.getAggregratesByClassName(parsed)
+    console.timeEnd('aggregate')
+    await webView.invoke('setContent', aggregrates)
   },
   async open(uri, webView) {
     // const content = await vscode.readFile(uri)
