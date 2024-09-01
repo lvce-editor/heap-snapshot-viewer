@@ -23,6 +23,7 @@ test('getAggregatesByClassName', async () => {
   const heapsnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
   const heapSnapshotContent = await readFile(heapsnapshotPath, 'utf8')
   const parsed = await worker.execute('Heapsnapshot.parse', heapSnapshotContent)
+  console.log(parsed.parsedNodes.length)
   const aggregates = await worker.execute('Heapsnapshot.getAggregatesByClassName', parsed)
   const regexCount = findClassCount(aggregates, 'RegExp')
   const systemCount = findClassCount(aggregates, '(system)')
