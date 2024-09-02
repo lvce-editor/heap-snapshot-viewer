@@ -42,6 +42,7 @@ test('getAggregatesByClassName', async () => {
   const vErrorCount = findClassCount(aggregates, 'VError')
   const webAssemblyModuleCount = findClassCount(aggregates, 'WebAssembly.Module')
   const pendingActivitiesCount = findClassCount(aggregates, 'Pending activities')
+  const symbolCount = findClassCount(aggregates, '(symbol)')
 
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
@@ -63,4 +64,5 @@ test('getAggregatesByClassName', async () => {
   expect(vErrorCount).toBe(1)
   expect(webAssemblyModuleCount).toBe(2)
   expect(pendingActivitiesCount).toBe(1)
+  expect(symbolCount).toBe(15)
 })
