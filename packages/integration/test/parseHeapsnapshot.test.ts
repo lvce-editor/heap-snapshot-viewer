@@ -28,7 +28,12 @@ test('parseHeapSnapshot', async () => {
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
   expect(parsed.parsedNodes).toHaveLength(18108)
-  expect(parsed.parsedNodes[0]).toEqual({ id: 1, name: '', type: 'synthetic' })
+  expect(parsed.parsedNodes[0]).toEqual({
+    id: 1,
+    name: '',
+    type: 'synthetic',
+    size: 0,
+  })
   // const edgeCount = getEdgeCount(parsed.graph)
   // expect(edgeCount).toBe(202000)
 })

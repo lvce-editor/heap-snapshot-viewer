@@ -12,6 +12,9 @@ export const getAggregratesByClassName = (parsed) => {
   const { parsedNodes } = parsed
   const countMap = Object.create(null)
   for (const node of parsedNodes) {
+    if (node.size === 0) {
+      continue
+    }
     const name = GetNodeClassName.getNodeClassName(node)
     countMap[name] ||= 0
     countMap[name]++
