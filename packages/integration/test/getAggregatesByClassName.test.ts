@@ -38,12 +38,16 @@ test('getAggregatesByClassName', async () => {
   const generatorCount = findClassCount(aggregates, 'Generator')
   const promiseCount = findClassCount(aggregates, 'Promise')
   const typedArrayCount = findClassCount(aggregates, 'TypedArray')
+  const heapNumberCount = findClassCount(aggregates, 'heap number')
   const numberCount = findClassCount(aggregates, '(number)')
   const vErrorCount = findClassCount(aggregates, 'VError')
   const webAssemblyModuleCount = findClassCount(aggregates, 'WebAssembly.Module')
   const pendingActivitiesCount = findClassCount(aggregates, 'Pending activities')
   const symbolCount = findClassCount(aggregates, '(symbol)')
 
+  // console.log(aggregates)
+  // const arrayNodes = parsed.parsedNodes.filter((node) => node.type === 'array')
+  console.log(parsed.parsedNodes[0])
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
   expect(regexCount).toBe(39)
@@ -60,6 +64,7 @@ test('getAggregatesByClassName', async () => {
   expect(generatorCount).toBe(6)
   expect(promiseCount).toBe(4)
   expect(typedArrayCount).toBe(22)
+  // expect(heapNumberCount).toBe(25)
   expect(vErrorCount).toBe(1)
   expect(webAssemblyModuleCount).toBe(2)
   expect(pendingActivitiesCount).toBe(1)
