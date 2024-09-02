@@ -39,6 +39,7 @@ test('getAggregatesByClassName', async () => {
   const promiseCount = findClassCount(aggregates, 'Promise')
   const typedArrayCount = findClassCount(aggregates, 'TypedArray')
   const heapNumberCount = findClassCount(aggregates, 'heap number')
+  const numberCount = findClassCount(aggregates, '(number)')
   const vErrorCount = findClassCount(aggregates, 'VError')
   const webAssemblyModuleCount = findClassCount(aggregates, 'WebAssembly.Module')
   const pendingActivitiesCount = findClassCount(aggregates, 'Pending activities')
@@ -65,4 +66,5 @@ test('getAggregatesByClassName', async () => {
   expect(webAssemblyModuleCount).toBe(2)
   expect(pendingActivitiesCount).toBe(1)
   expect(symbolCount).toBe(15)
+  expect(numberCount).toBe(25)
 })
