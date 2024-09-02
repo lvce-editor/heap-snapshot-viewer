@@ -52,7 +52,7 @@ test('getAggregatesByClassName', async () => {
   expect(compiledCodeCount).toBe(4098)
   expect(functionCount).toBe(1620)
   expect(stringCount).toBe(3519)
-  // expect(objectShapeCount).toBe(1379)
+  expect(objectShapeCount).toBe(1379)
   // expect(arrayCount).toBe(35)
   expect(objectCount).toBe(77)
   expect(errorCount).toBe(24)
