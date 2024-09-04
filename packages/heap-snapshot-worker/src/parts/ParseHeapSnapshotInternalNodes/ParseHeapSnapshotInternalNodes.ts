@@ -1,12 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ParseHeapSnapshotInternalObjects from '../ParseHeapSnapshotInternalObjects/ParseHeapSnapshotInternalObjects.ts'
 
-export const parseHeapSnapshotInternalNodes = (
-  nodes,
-  nodeFields,
-  nodeTypes,
-  strings,
-) => {
+export const parseHeapSnapshotInternalNodes = (nodes, nodeFields, nodeTypes, strings) => {
   Assert.array(nodes)
   Assert.array(nodeFields)
   Assert.array(nodeTypes)
@@ -15,7 +10,7 @@ export const parseHeapSnapshotInternalNodes = (
   const nameKey = 'name'
   const indexMultiplierKey = ''
   const indexMultiplier = 1
-  return ParseHeapSnapshotInternalObjects.parseHeapSnapshotObjects(
+  const parsedNodes = ParseHeapSnapshotInternalObjects.parseHeapSnapshotObjects(
     nodes,
     nodeFields,
     nodeTypes,
@@ -25,4 +20,5 @@ export const parseHeapSnapshotInternalNodes = (
     indexMultiplier,
     strings,
   )
+  return parsedNodes
 }
