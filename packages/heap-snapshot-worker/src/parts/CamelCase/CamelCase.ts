@@ -1,4 +1,4 @@
-const RE_DASH = /-([a-z])/g
+const RE_DASH = /\_([a-z])/g
 
 export const camelCase = (value: string) => {
   const camelCased = value.replace(RE_DASH, (g) => {

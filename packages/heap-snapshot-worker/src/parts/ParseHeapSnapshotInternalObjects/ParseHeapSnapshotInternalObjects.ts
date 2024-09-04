@@ -18,6 +18,7 @@ export const parseHeapSnapshotObjects = (
   const parsed: any[] = []
   const nodeFieldCount = valueFields.length
   const camelCaseNodeFields = valueFields.map(CamelCase.camelCase)
+  console.log({ camelCaseNodeFields })
   for (let i = 0; i < values.length; i += nodeFieldCount) {
     const node = CreateHeapSnapshotNode.createHeapSnapshotNode(
       values,
