@@ -64,6 +64,9 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
   }
   for (let i = 0; i < nodes.length; i++) {
     const ownerId = owners[i]
+    if (i === 29) {
+      console.log({ ownerId })
+    }
     switch (ownerId) {
       case kUnvisited:
       case kHasMultipleOwners:
@@ -74,6 +77,9 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
         const ownerNodeIndex = ownerId
         const owner = nodes[ownerNodeIndex]
         if (owner.type === NodeType.Synthetic || ownerNodeIndex === 0) {
+          if (i === 29) {
+            console.log('owner is synth')
+          }
           break
         }
         const owned = nodes[ownedNodeIndex]
