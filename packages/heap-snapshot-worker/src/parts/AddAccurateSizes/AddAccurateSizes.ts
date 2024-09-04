@@ -2,7 +2,6 @@
 import * as NodeType from '../NodeType/NodeType.ts'
 
 export const addAccurateSizes = (graph, nodes) => {
-  // compute accurate sizes
   const owners = new Uint32Array(nodes.length)
   const kUnvisited = 0xffffffff
   const kHasMultipleOwners = 0xfffffffe
