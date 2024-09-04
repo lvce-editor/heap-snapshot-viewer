@@ -86,6 +86,7 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
           console.log('transfer')
         }
         const owned = nodes[ownedNodeIndex]
+        // @ts-ignore
         const sizeToTransfer = owned.selfSize
 
         // TODO create new nodes array?
