@@ -1,3 +1,4 @@
+// based on Chrome Devtools Heap Snapshot(https://github.com/ChromeDevTools/devtools-frontend/blob/7ca2fec01b492e9b23b21738394200397a74c4aa/front_end/entrypoints/heap_snapshot_worker/HeapSnapshot.ts, License BSD)
 import * as NodeType from '../NodeType/NodeType.ts'
 
 export const addAccurateSizes = (graph, nodes) => {
