@@ -30,10 +30,6 @@ export const parseHeapSnapshotObjects = (
       indexMultiplier,
       strings,
     )
-    if (i === 91497) {
-      console.log({ raw: values[91497 + 3] })
-      console.log({ special: node })
-    }
     parsed.push(node)
   }
   return parsed
