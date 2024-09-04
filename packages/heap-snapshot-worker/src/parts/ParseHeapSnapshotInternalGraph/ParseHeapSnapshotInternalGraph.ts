@@ -14,5 +14,6 @@ export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
       graph[node.id].push({ index: edge.toNode, name: edge.nameOrIndex })
     }
   }
+  console.log('g', graph[59])
   return graph
 }

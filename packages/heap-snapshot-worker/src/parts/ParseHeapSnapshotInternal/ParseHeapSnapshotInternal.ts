@@ -24,6 +24,7 @@ export const parseHeapSnapshotInternal = (nodes, nodeFields, nodeTypes, edges, e
   )
   // console.log({ parsedEdges })
   const graph = ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(parsedNodes, parsedEdges)
+  // console.log({ graph })
   AddAccurateSizes.addAccurateSizes(graph, parsedNodes)
   const cleanNodes = CleanNodes.cleanNode(parsedNodes)
   return {

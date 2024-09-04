@@ -10,6 +10,8 @@ export const parseHeapSnapshotInternalNodes = (nodes, nodeFields, nodeTypes, str
   const nameKey = 'name'
   const indexMultiplierKey = ''
   const indexMultiplier = 1
+  console.log(nodeFields)
+  console.log(strings[30])
   const parsedNodes = ParseHeapSnapshotInternalObjects.parseHeapSnapshotObjects(
     nodes,
     nodeFields,

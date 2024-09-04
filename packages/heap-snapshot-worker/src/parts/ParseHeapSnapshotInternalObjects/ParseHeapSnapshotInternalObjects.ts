@@ -30,6 +30,9 @@ export const parseHeapSnapshotObjects = (
       indexMultiplier,
       strings,
     )
+    if (node.toNode === 29) {
+      console.log({ edge: node })
+    }
     parsed.push(node)
   }
   return parsed
