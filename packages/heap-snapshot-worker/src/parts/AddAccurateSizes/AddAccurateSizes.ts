@@ -18,22 +18,18 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       worklist.push(i)
     }
   }
-  console.log({ w: [...worklist] })
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
     const node = nodes[id]
     const edges = graph[node.id] || []
-    console.log({ node, edges })
     for (const edge of edges) {
       if (edge.type === EdgeType.Weak) {
         continue
       }
       const targetId = edge.nodeIndex
-      console.log({ targetId })
       switch (owners[targetId]) {
         case kUnvisited:
-          console.log('was unvisted')
           owners[targetId] = owner
           worklist.push(targetId)
           break
