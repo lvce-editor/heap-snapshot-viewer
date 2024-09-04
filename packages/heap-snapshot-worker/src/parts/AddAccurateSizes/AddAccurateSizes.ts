@@ -1,8 +1,8 @@
 // based on Chrome Devtools Heap Snapshot(https://github.com/ChromeDevTools/devtools-frontend/blob/7ca2fec01b492e9b23b21738394200397a74c4aa/front_end/entrypoints/heap_snapshot_worker/HeapSnapshot.ts, License BSD)
+import * as EdgeType from '../EdgeType/EdgeType.ts'
 import type { Graph } from '../Graph/Graph.ts'
 import type { Node } from '../Node/Node.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
-import * as EdgeType from '../EdgeType/EdgeType.ts'
 
 export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
   const owners = new Uint32Array(nodes.length)
