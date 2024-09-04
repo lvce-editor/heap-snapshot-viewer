@@ -1,19 +1,20 @@
 import { expect, test } from '@jest/globals'
-import * as GetNodeClassName from '../src/parts/GetNodeClassName/GetNodeClassName.js'
-import * as NodeType from '../src/parts/NodeType/NodeType.js'
+import * as AddAccurateSizes from '../src/parts/AddAccurateSizes/AddAccurateSizes.ts'
+import type { Node } from '../src/parts/Node/Node.ts'
+import * as NodeType from '../src/parts/NodeType/NodeType.ts'
 
 test.skip('add size to array', () => {
   // @ts-ignore
-  const node1 = {
-    type: NodeType.Array,
-    id: 1,
-  }
+  const nodes: readonly Node[] = [
+    {
+      type: NodeType.Array,
+      id: 1,
+      name: '',
+    },
+  ]
   // @ts-ignore
   const graph = {
     1: [],
   }
-  const node = {
-    type: 'hidden',
-  }
-  expect(GetNodeClassName.getNodeClassName(node)).toBe('(system)')
+  expect(AddAccurateSizes.addAccurateSizes(graph, nodes)).toBe('(system)')
 })
