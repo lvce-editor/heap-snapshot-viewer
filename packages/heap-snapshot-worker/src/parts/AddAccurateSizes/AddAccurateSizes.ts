@@ -18,18 +18,22 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       worklist.push(i)
     }
   }
+  console.log({ w: [...worklist] })
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
     const node = nodes[id]
     const edges = graph[node.id] || []
+    console.log({ node, edges })
     for (const edge of edges) {
       if (edge.type === EdgeType.Weak) {
         continue
       }
       const targetId = edge.nodeIndex
+      console.log({ targetId })
       switch (owners[targetId]) {
         case kUnvisited:
+          console.log('was unvisted')
           owners[targetId] = owner
           worklist.push(targetId)
           break
@@ -46,16 +50,18 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
   }
   for (let i = 0; i < nodes.length; i++) {
     const ownerId = owners[i]
+    console.log('ownger id', ownerId)
     switch (ownerId) {
       case kUnvisited:
       case kHasMultipleOwners:
       case i:
         break
       default:
+        console.log('default', i)
         const ownedNodeIndex = i
         const ownerNodeIndex = ownerId
         const owner = nodes[ownerNodeIndex]
-        if (owner.type === 'synthetic' || ownerNodeIndex === 0) {
+        if (owner.type === NodeType.Synthetic || ownerNodeIndex === 0) {
           break
         }
         const owned = nodes[ownedNodeIndex]

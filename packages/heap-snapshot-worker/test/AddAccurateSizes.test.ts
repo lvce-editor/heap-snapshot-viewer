@@ -8,27 +8,34 @@ test.only('add size to array owner', () => {
   // @ts-ignore
   const nodes: readonly Node[] = [
     {
-      type: NodeType.Object,
+      type: NodeType.Root,
       id: 1,
       name: '',
       size: 1,
     },
     {
-      type: NodeType.Array,
+      type: NodeType.Object,
       id: 2,
+      name: '',
+      size: 1,
+    },
+    {
+      type: NodeType.Array,
+      id: 3,
       name: '',
       size: 2,
     },
   ]
   const graph: Graph = {
-    1: [
+    2: [
       {
         type: 'edge',
-        nodeIndex: 1,
+        nodeIndex: 2,
       },
     ],
   }
   AddAccurateSizes.addAccurateSizes(graph, nodes)
-  expect(nodes[0].size).toBe(3)
-  expect(nodes[1].size).toBe(0)
+  expect(nodes[0].size).toBe(1)
+  expect(nodes[1].size).toBe(3)
+  expect(nodes[2].size).toBe(0)
 })
