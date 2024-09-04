@@ -24,7 +24,6 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       delete graph[a]
     }
   }
-  console.log(graph)
   for (const node of nodes) {
     const edges = graph[node.id] || []
     // console.log({ edges })

@@ -47,7 +47,6 @@ test('getAggregatesByClassName', async () => {
 
   // console.log(aggregates)
   // const arrayNodes = parsed.parsedNodes.filter((node) => node.type === 'array')
-  console.log(parsed.parsedNodes[0])
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
   expect(regexCount).toBe(39)
