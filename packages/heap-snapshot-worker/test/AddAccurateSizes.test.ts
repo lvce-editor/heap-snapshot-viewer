@@ -4,7 +4,7 @@ import type { Node } from '../src/parts/Node/Node.ts'
 import * as NodeType from '../src/parts/NodeType/NodeType.ts'
 import type { Graph } from '../src/parts/Graph/Graph.ts'
 
-test.skip('add size to array owner', () => {
+test.only('add size to array owner', () => {
   // @ts-ignore
   const nodes: readonly Node[] = [
     {
