@@ -11,7 +11,13 @@ const compareCount = (a, b) => {
 export const getAggregratesByClassName = (parsed) => {
   const { parsedNodes } = parsed
   const countMap = Object.create(null)
+  const zNodes = parsedNodes.filter((n) => n.size === 0)
+  console.log(zNodes)
+  // console.log(parsedNodes[100])
   for (const node of parsedNodes) {
+    // if (!node.size) {
+    //   console.log(node)
+    // }
     if (node.size === 0) {
       continue
     }

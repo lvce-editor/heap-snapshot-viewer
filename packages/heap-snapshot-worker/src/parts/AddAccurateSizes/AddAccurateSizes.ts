@@ -18,6 +18,8 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       worklist.push(i)
     }
   }
+  console.log(nodes.find((n) => n.id === 14867))
+  // console.log(nodes[91497 / 7])
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
