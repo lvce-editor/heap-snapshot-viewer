@@ -50,14 +50,12 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
   }
   for (let i = 0; i < nodes.length; i++) {
     const ownerId = owners[i]
-    console.log('ownger id', ownerId)
     switch (ownerId) {
       case kUnvisited:
       case kHasMultipleOwners:
       case i:
         break
       default:
-        console.log('default', i)
         const ownedNodeIndex = i
         const ownerNodeIndex = ownerId
         const owner = nodes[ownerNodeIndex]

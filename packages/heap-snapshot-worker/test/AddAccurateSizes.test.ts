@@ -1,11 +1,10 @@
 import { expect, test } from '@jest/globals'
 import * as AddAccurateSizes from '../src/parts/AddAccurateSizes/AddAccurateSizes.ts'
+import type { Graph } from '../src/parts/Graph/Graph.ts'
 import type { Node } from '../src/parts/Node/Node.ts'
 import * as NodeType from '../src/parts/NodeType/NodeType.ts'
-import type { Graph } from '../src/parts/Graph/Graph.ts'
 
-test.only('add size to array owner', () => {
-  // @ts-ignore
+test('add size to array owner', () => {
   const nodes: readonly Node[] = [
     {
       type: NodeType.Root,
