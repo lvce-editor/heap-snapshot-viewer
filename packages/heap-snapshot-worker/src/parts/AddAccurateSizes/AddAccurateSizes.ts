@@ -18,21 +18,21 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       worklist.push(i)
     }
   }
-  const special = nodes[29]
+  const special = nodes[7436]
   // for (const a in graph) {
   //   if (graph[a].length === 0) {
   //     delete graph[a]
   //   }
   // }
-  // for (const node of nodes) {
-  //   const edges = graph[node.id] || []
-  //   // console.log({ edges })
-  //   for (const edge of edges) {
-  //     if (edge.nodeIndex === 29) {
-  //       console.log({ edge })
-  //     }
-  //   }
-  // }
+  for (const node of nodes) {
+    const edges = graph[node.id] || []
+    // console.log({ edges })
+    for (const edge of edges) {
+      if (edge.index === 7436) {
+        console.log({ edge })
+      }
+    }
+  }
   console.log({ special })
   // console.log(nodes.find((n) => n.id === 14867))
   // console.log(nodes[91497 / 7])
@@ -64,7 +64,7 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
   }
   for (let i = 0; i < nodes.length; i++) {
     const ownerId = owners[i]
-    if (i === 29) {
+    if (i === 7436) {
       console.log({ ownerId })
     }
     switch (ownerId) {
@@ -77,20 +77,24 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
         const ownerNodeIndex = ownerId
         const owner = nodes[ownerNodeIndex]
         if (owner.type === NodeType.Synthetic || ownerNodeIndex === 0) {
-          if (i === 29) {
+          if (i === 7436) {
             console.log('owner is synth')
           }
           break
         }
+        if (i === 7436) {
+          console.log('transfer')
+        }
         const owned = nodes[ownedNodeIndex]
-        const sizeToTransfer = owned.size
+        const sizeToTransfer = owned.selfSize
 
         // TODO create new nodes array?
         // @ts-ignore
-        owned.size = 0
+        owned.selfSize = 0
         // @ts-ignore
-        owner.size += sizeToTransfer
+        owner.selfSize += sizeToTransfer
         break
     }
   }
+  console.log('final', nodes[7436])
 }

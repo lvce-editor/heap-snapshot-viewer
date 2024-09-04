@@ -1,9 +1,9 @@
 export const cleanNode = (node) => {
-  const { type, name, id, self_size } = node
+  const { type, name, id, selfSize } = node
   return {
     type,
     name,
     id,
-    size: self_size,
+    size: selfSize,
   }
 }
