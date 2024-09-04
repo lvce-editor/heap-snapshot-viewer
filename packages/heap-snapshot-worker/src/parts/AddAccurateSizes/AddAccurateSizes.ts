@@ -70,5 +70,4 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
         break
     }
   }
-  console.log('final', nodes[7436])
 }
