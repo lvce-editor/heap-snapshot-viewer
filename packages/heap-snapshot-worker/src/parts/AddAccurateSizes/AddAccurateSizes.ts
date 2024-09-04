@@ -45,7 +45,7 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       if (edge.type === EdgeType.Weak) {
         continue
       }
-      const targetId = edge.nodeIndex
+      const targetId = edge.index
       switch (owners[targetId]) {
         case kUnvisited:
           owners[targetId] = owner

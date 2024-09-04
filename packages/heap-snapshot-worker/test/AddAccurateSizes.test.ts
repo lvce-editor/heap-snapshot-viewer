@@ -29,7 +29,7 @@ test('add size to array owner', () => {
     2: [
       {
         type: 'edge',
-        nodeIndex: 2,
+        index: 2,
       },
     ],
   }
