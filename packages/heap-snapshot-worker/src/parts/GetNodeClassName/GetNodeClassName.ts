@@ -1,6 +1,7 @@
+import type { Node } from '../Node/Node.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
 
-export const getNodeClassName = (node) => {
+export const getNodeClassName = (node: Node) => {
   switch (node.type) {
     case NodeType.Hidden:
       return '(system)'
