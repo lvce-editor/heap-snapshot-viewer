@@ -45,7 +45,6 @@ test('getAggregatesByClassName', async () => {
   const pendingActivitiesCount = findClassCount(aggregates, 'Pending activities')
   const symbolCount = findClassCount(aggregates, '(symbol)')
 
-  // console.log(aggregates)
   // const arrayNodes = parsed.parsedNodes.filter((node) => node.type === 'array')
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
