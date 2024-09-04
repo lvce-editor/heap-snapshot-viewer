@@ -10,31 +10,31 @@ test('add size to array owner', () => {
       type: NodeType.Root,
       id: 1,
       name: '',
-      size: 1,
+      selfSize: 1,
     },
     {
       type: NodeType.Object,
       id: 2,
       name: '',
-      size: 1,
+      selfSize: 1,
     },
     {
       type: NodeType.Array,
       id: 3,
       name: '',
-      size: 2,
+      selfSize: 2,
     },
   ]
   const graph: Graph = {
     2: [
       {
         type: 'edge',
-        nodeIndex: 2,
+        index: 2,
       },
     ],
   }
   AddAccurateSizes.addAccurateSizes(graph, nodes)
-  expect(nodes[0].size).toBe(1)
-  expect(nodes[1].size).toBe(3)
-  expect(nodes[2].size).toBe(0)
+  expect(nodes[0].selfSize).toBe(1)
+  expect(nodes[1].selfSize).toBe(3)
+  expect(nodes[2].selfSize).toBe(0)
 })

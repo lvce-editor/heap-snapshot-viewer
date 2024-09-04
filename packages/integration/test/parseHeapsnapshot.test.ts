@@ -6,16 +6,6 @@ import { testWorker } from '../src/testWorker.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const getEdgeCount = (graph) => {
-  console.log(graph)
-  let count = 0
-  for (const [key, value] of Object.entries(graph)) {
-    // @ts-ignore
-    count += value.length
-  }
-  return count
-}
-
 test('parseHeapSnapshot', async () => {
   const execMap = {}
   const worker = await testWorker({

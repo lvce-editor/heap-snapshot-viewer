@@ -45,18 +45,16 @@ test('getAggregatesByClassName', async () => {
   const pendingActivitiesCount = findClassCount(aggregates, 'Pending activities')
   const symbolCount = findClassCount(aggregates, '(symbol)')
 
-  // console.log(aggregates)
   // const arrayNodes = parsed.parsedNodes.filter((node) => node.type === 'array')
-  console.log(parsed.parsedNodes[0])
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
   expect(regexCount).toBe(39)
-  // expect(systemCount).toBe(3677) // TODO
+  expect(systemCount).toBe(3677) // TODO
   expect(compiledCodeCount).toBe(4098)
   expect(functionCount).toBe(1620)
   expect(stringCount).toBe(3519)
   expect(objectShapeCount).toBe(1379)
-  // expect(arrayCount).toBe(35)
+  expect(arrayCount).toBe(35)
   expect(objectCount).toBe(77)
   expect(errorCount).toBe(24)
   expect(eventTargetCount).toBe(5)
@@ -64,7 +62,6 @@ test('getAggregatesByClassName', async () => {
   expect(generatorCount).toBe(6)
   expect(promiseCount).toBe(4)
   expect(typedArrayCount).toBe(22)
-  // expect(heapNumberCount).toBe(25)
   expect(vErrorCount).toBe(1)
   expect(webAssemblyModuleCount).toBe(2)
   expect(pendingActivitiesCount).toBe(1)
