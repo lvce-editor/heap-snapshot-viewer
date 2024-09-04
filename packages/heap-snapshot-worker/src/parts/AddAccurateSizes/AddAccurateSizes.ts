@@ -18,24 +18,6 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
       worklist.push(i)
     }
   }
-  const special = nodes[7436]
-  // for (const a in graph) {
-  //   if (graph[a].length === 0) {
-  //     delete graph[a]
-  //   }
-  // }
-  for (const node of nodes) {
-    const edges = graph[node.id] || []
-    // console.log({ edges })
-    for (const edge of edges) {
-      if (edge.index === 7436) {
-        console.log({ edge })
-      }
-    }
-  }
-  console.log({ special })
-  // console.log(nodes.find((n) => n.id === 14867))
-  // console.log(nodes[91497 / 7])
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
