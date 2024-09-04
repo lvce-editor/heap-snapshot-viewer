@@ -2,6 +2,7 @@
 import type { Graph } from '../Graph/Graph.ts'
 import type { Node } from '../Node/Node.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
+import * as EdgeType from '../EdgeType/EdgeType.ts'
 
 export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
   const owners = new Uint32Array(nodes.length)
@@ -23,7 +24,7 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
     const node = nodes[id]
     const edges = graph[node.id] || []
     for (const edge of edges) {
-      if (edge.type === 'weak') {
+      if (edge.type === EdgeType.Weak) {
         continue
       }
       const targetId = edge.nodeIndex
@@ -54,7 +55,7 @@ export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
         const ownedNodeIndex = i
         const ownerNodeIndex = ownerId
         const owner = nodes[ownerNodeIndex]
-        if (owner.type === 'synthetic' || ownerNodeIndex === 0) {
+        if (owner.type === NodeType.Synthetic || ownerNodeIndex === 0) {
           break
         }
         const owned = nodes[ownedNodeIndex]
