@@ -23,7 +23,6 @@ export const addAccurateSizes = (
   strings: readonly string[],
   firstEdgeIndexes: Uint32Array,
 ) => {
-  const owners = new Uint32Array(nodes.length)
   const kUnvisited = 0xffffffff
   const kHasMultipleOwners = 0xfffffffe
   const worklist: number[] = []
@@ -35,6 +34,7 @@ export const addAccurateSizes = (
   const nodeSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeFieldCount = nodeFields.length
   const nodeCount = nodes.length / nodeFieldCount
+  const owners = new Uint32Array(nodeCount)
   let nodeIndex = 0
   for (let i = 0; i < nodeCount; i++) {
     const nodeType = getNodeType(nodes, nodeIndex, typeIndex, nodeTypes)
@@ -75,6 +75,7 @@ export const addAccurateSizes = (
       }
     }
   }
+  console.log({ owners })
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
     switch (ownerId) {
