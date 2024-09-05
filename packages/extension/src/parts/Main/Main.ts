@@ -29,6 +29,13 @@ const webViewProvider = {
       name: 'create',
       time: createTimeEnd - createTime,
     })
+    const preparseTime = performance.now()
+    await HeapSnapshotWorker.invoke('HeapSnapshot.preparse', heapSnapshotId)
+    const preparseTimeEnd = performance.now()
+    timings.push({
+      name: 'pre-parse',
+      time: preparseTimeEnd - preparseTime,
+    })
     const parseTime = performance.now()
     await HeapSnapshotWorker.invoke('HeapSnapshot.parse', heapSnapshotId)
     const parseTimeEnd = performance.now()
