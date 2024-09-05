@@ -1,4 +1,5 @@
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
+import * as EdgeFieldType from '../EdgeFieldType/EdgeFieldType.ts'
 
 export const parseHeapSnapshotInternal = (
   nodes: Uint32Array,
@@ -9,9 +10,8 @@ export const parseHeapSnapshotInternal = (
   edgeTypes: readonly string[],
   strings: string[],
 ) => {
-  console.log({ nodeFields, nodeTypes, edgeFields, edgeTypes })
   const nodeFieldCount = nodeFields.length
-  const edgeCountOffset = nodeFields.indexOf('edge_count')
+  const edgeCountOffset = nodeFields.indexOf(EdgeFieldType.EdgeCount)
   const firstEdgeIndexes = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(nodes, edgeCountOffset, nodeFieldCount)
   return {
     firstEdgeIndexes,
