@@ -1,5 +1,6 @@
 import * as GetNodeClassName from '../GetNodeClassName/GetNodeClassName.ts'
 import * as GetTime from '../GetTime/GetTime.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as IsTest from '../IsTest/IsTest.ts'
 
 const toSorted = (items, compare) => {
@@ -10,8 +11,9 @@ const compareCount = (a, b) => {
   return b.count - a.count
 }
 
-export const getAggregratesByClassName = (parsed) => {
+export const getAggregratesByClassName = (id: number) => {
   const start = GetTime.getTime()
+  const { parsed } = HeapSnapshotState.get(id)
   const { parsedNodes } = parsed
   const countMap = Object.create(null)
   for (const node of parsedNodes) {
