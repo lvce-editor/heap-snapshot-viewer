@@ -3,6 +3,8 @@ import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHe
 
 export const parseHeapSnapshot = (id: number) => {
   const { nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings } = HeapSnapshotState.get(id)
+  const nodeCount = nodes.length / nodeFields.length
+  const firstEdgeIndexes = new Uint32Array(nodeCount)
   const parsed = ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,
     nodeFields,

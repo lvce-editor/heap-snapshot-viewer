@@ -1,23 +1,11 @@
-import * as Assert from '../Assert/Assert.ts'
-import * as ParseHeapSnapshotInternalObjects from '../ParseHeapSnapshotInternalObjects/ParseHeapSnapshotInternalObjects.ts'
-
-export const parseHeapSnapshotInternalEdges = (edges, edgeFields, edgeTypes, nodeFieldCount, strings) => {
-  Assert.array(edgeFields)
-  Assert.array(edgeTypes)
-  Assert.number(nodeFieldCount)
-  Assert.array(strings)
-  const typeKey = 'type'
-  const nameKey = 'nameOrIndex'
-  const indexMultiplierKey = 'toNode'
-  const indexMultiplier = nodeFieldCount
-  return ParseHeapSnapshotInternalObjects.parseHeapSnapshotObjects(
-    edges,
-    edgeFields,
-    edgeTypes,
-    typeKey,
-    nameKey,
-    indexMultiplierKey,
-    indexMultiplier,
-    strings,
-  )
+export const parseHeapSnapshotInternalEdges = (nodes: Uint32Array, edgeCountOffset: number, nodeFieldCount: number) => {
+  const nodeCount = nodes.length / nodeFieldCount
+  const firstEdgeIndexes = new Uint32Array(nodeCount + 1)
+  let edgeIndex = 0
+  for (let i = 0; i < nodeCount; i++) {
+    firstEdgeIndexes[i] = edgeIndex
+    const edgeCount = nodes[i * nodeFieldCount + edgeCountOffset]
+    edgeIndex += edgeCount
+  }
+  return firstEdgeIndexes
 }
