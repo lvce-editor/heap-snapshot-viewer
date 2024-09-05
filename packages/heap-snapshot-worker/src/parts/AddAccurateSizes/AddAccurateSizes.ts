@@ -53,7 +53,6 @@ export const addAccurateSizes = (
     const edgeStart = firstEdgeIndexes[id]
     const edgeCount = nodes[id * nodeFieldCount + edgeCountOffset]
     const edgeEnd = edgeStart + edgeCount * edgeFieldCount
-    console.log({ edgeStart, edgeCount, id, edgeCountOffset, edges })
     for (let i = edgeStart; i < edgeEnd; i += edgeFieldCount) {
       const edgeType = getEdgeType(edges, i, edgeTypeOffset, edgeTypes)
       if (edgeType === EdgeType.Weak) {
@@ -76,7 +75,6 @@ export const addAccurateSizes = (
       }
     }
   }
-  console.log({ owners })
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
     switch (ownerId) {
