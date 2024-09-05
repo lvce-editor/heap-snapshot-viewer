@@ -14,7 +14,7 @@ export const parseHeapSnapshotInternal = (
   const nodeFieldCount = nodeFields.length
   const edgeCountOffset = nodeFields.indexOf(EdgeFieldType.EdgeCount)
   const firstEdgeIndexes = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(nodes, edgeCountOffset, nodeFieldCount)
-  AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)
+  AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings, firstEdgeIndexes)
   return {
     firstEdgeIndexes,
   }
