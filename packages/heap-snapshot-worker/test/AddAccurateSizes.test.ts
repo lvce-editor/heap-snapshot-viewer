@@ -1,4 +1,4 @@
-import { test, expect } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import * as AddAccurateSizes from '../src/parts/AddAccurateSizes/AddAccurateSizes.ts'
 
 const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']
