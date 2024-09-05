@@ -4,12 +4,12 @@ import * as EdgeType from '../EdgeType/EdgeType.ts'
 import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
 
-const getNodeType = (nodes: Uint32Array, i: number, typeIndex: number, nodeTypes: readonly string[]) => {
-  const value = nodes[i + typeIndex]
+const getNodeType = (nodes: Uint32Array, nodeIndex: number, typeIndex: number, nodeTypes: readonly string[]) => {
+  const value = nodes[nodeIndex + typeIndex]
   return nodeTypes[value]
 }
-const getEdgeType = (edges: Uint32Array, i: number, typeIndex: number, edgeTypes: readonly string[]) => {
-  const value = edges[i + typeIndex]
+const getEdgeType = (edges: Uint32Array, edgeIndex: number, typeIndex: number, edgeTypes: readonly string[]) => {
+  const value = edges[edgeIndex + typeIndex]
   return edgeTypes[value]
 }
 
@@ -45,7 +45,6 @@ export const addAccurateSizes = (
       worklist.push(i)
     }
   }
-  console.log({ edgeFieldCount })
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
