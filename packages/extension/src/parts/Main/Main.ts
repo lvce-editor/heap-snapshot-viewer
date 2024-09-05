@@ -11,22 +11,32 @@ import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts
 const webViewProvider = {
   id: 'builtin.heap-snapshot-viewer',
   async create(webView, uri) {
+    const timings: any[] = []
+    const startReadFile = performance.now()
     // @ts-ignore
     const content = await vscode.readFile(uri)
+    const endReadFile = performance.now()
+    timings.push({
+      name: 'read-file',
+      time: endReadFile - startReadFile,
+    })
     // TODO use heapsnapshot worker to parse heapsnapshot
-    const timings: any[] = []
+    const fullParseTime = performance.now()
     const parsed = await HeapSnapshotWorker.invoke('Heapsnapshot.parse', content)
+    const fullParseTimeEnd = performance.now()
+    timings.push({
+      name: 'full-parse',
+      time: fullParseTimeEnd - fullParseTime,
+    })
     timings.push({
       name: 'parse',
       time: parsed.time,
     })
-    console.time('aggregate')
     const aggregrates = await HeapSnapshotWorker.invoke('Heapsnapshot.getAggregatesByClassName', parsed)
     timings.push({
       name: 'aggregate',
       time: aggregrates.time,
     })
-    console.timeEnd('aggregate')
     await webView.invoke('initialize', aggregrates, timings)
     // TODO support connecting state to webview
     // @ts-ignore
