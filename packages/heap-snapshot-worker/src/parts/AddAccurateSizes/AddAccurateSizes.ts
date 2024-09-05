@@ -25,7 +25,7 @@ export const addAccurateSizes = (
   const kUnvisited = 0xffffffff
   const kHasMultipleOwners = 0xfffffffe
   const worklist: number[] = []
-  const typeIndex = nodeFields.indexOf(NodeFieldType.Type)
+  const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
   const edgeFieldCount = edgeFields.length
   const edgeTypeOffset = edgeFields.indexOf(EdgeFieldType.Type)
@@ -34,9 +34,10 @@ export const addAccurateSizes = (
   const nodeFieldCount = nodeFields.length
   const nodeCount = nodes.length / nodeFieldCount
   const owners = new Uint32Array(nodeCount)
+  console.log({ nodeTypeOffset, edgeCountOffset, edgeToNodeOffset, nodeFieldCount })
   for (let i = 0; i < nodeCount; i++) {
     const nodeIndex = i * nodeFieldCount
-    const nodeType = getNodeType(nodes, nodeIndex, typeIndex, nodeTypes)
+    const nodeType = getNodeType(nodes, nodeIndex, nodeTypeOffset, nodeTypes)
     // TODO compare number?
     if (nodeType === NodeType.Hidden || nodeType === NodeType.Array) {
       owners[i] = kUnvisited
@@ -83,7 +84,7 @@ export const addAccurateSizes = (
       default:
         const ownedNodeIndex = i * nodeFieldCount
         const ownerNodeIndex = ownerId * nodeFieldCount
-        const ownerType = getNodeType(nodes, ownerNodeIndex, typeIndex, nodeTypes)
+        const ownerType = getNodeType(nodes, ownerNodeIndex, nodeTypeOffset, nodeTypes)
         if (ownerType === NodeType.Synthetic || ownerNodeIndex === 0) {
           break
         }
