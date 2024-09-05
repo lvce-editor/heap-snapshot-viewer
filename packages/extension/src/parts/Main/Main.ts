@@ -21,22 +21,31 @@ const webViewProvider = {
       time: endReadFile - startReadFile,
     })
     // TODO use heapsnapshot worker to parse heapsnapshot
-    const fullParseTime = performance.now()
-    const parsed = await HeapSnapshotWorker.invoke('Heapsnapshot.parse', content)
-    const fullParseTimeEnd = performance.now()
+    const heapSnapshotId = 1
+    const createTime = performance.now()
+    await HeapSnapshotWorker.invoke('HeapSnapshot.create', heapSnapshotId, content)
+    const createTimeEnd = performance.now()
     timings.push({
-      name: 'full-parse',
-      time: fullParseTimeEnd - fullParseTime,
+      name: 'create',
+      time: createTimeEnd - createTime,
     })
+    const parseTime = performance.now()
+    await HeapSnapshotWorker.invoke('HeapSnapshot.parse', heapSnapshotId)
+    const parseTimeEnd = performance.now()
     timings.push({
       name: 'parse',
-      time: parsed.time,
+      time: parseTimeEnd - parseTime,
     })
-    const aggregrates = await HeapSnapshotWorker.invoke('Heapsnapshot.getAggregatesByClassName', parsed)
+
+    const aggregatesStart = performance.now()
+    const aggregrates = await HeapSnapshotWorker.invoke('HeapSnapshot.getAggregatesByClassName', heapSnapshotId)
+    const aggregatesEnd = performance.now()
     timings.push({
-      name: 'aggregate',
-      time: aggregrates.time,
+      name: 'aggregates',
+      time: aggregatesEnd - aggregatesStart,
     })
+
+    await HeapSnapshotWorker.invoke('HeapSnapshot.dispose', heapSnapshotId)
     await webView.invoke('initialize', aggregrates, timings)
     // TODO support connecting state to webview
     // @ts-ignore

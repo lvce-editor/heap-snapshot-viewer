@@ -11,9 +11,12 @@ test('parseHeapSnapshot', async () => {
   const worker = await testWorker({
     execMap,
   })
-  const heapsnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
-  const heapSnapshotContent = await readFile(heapsnapshotPath, 'utf8')
-  const parsed = await worker.execute('Heapsnapshot.parse', heapSnapshotContent)
+  const heapSnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
+  const heapSnapshotContent = await readFile(heapSnapshotPath, 'utf8')
+  const heapSnapshotId = 1
+  await worker.execute('HeapSnapshot.create', heapSnapshotId, heapSnapshotContent)
+  await worker.execute('HeapSnapshot.parse', heapSnapshotId)
+  const { parsed } = await worker.execute('HeapSnapshot.get', heapSnapshotId)
   expect(parsed.parsedNodes).toBeDefined()
   // for testing, compare how these numbers are displayed
   // in the chrome devtools heapsnapshot viewer
