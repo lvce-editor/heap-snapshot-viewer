@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as GetAggregatesByClassName from '../src/parts/GetAggregatesByClassName/GetAggregatesByClassName.js'
+import * as GetAggregatesByClassNameInternal from '../src/parts/GetAggregatesByClassNameInternal/GetAggregatesByClassNameInternal.js'
 
 test('exclude zero size node', () => {
   const parsed = {
@@ -10,14 +10,14 @@ test('exclude zero size node', () => {
       },
     ],
   }
-  expect(GetAggregatesByClassName.getAggregratesByClassName(parsed)).toEqual([])
+  expect(GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(parsed)).toEqual([])
 })
 
 test('regexp node', () => {
   const parsed = {
     parsedNodes: [{ type: 'regexp', size: 1, name: '' }],
   }
-  expect(GetAggregatesByClassName.getAggregratesByClassName(parsed)).toEqual([
+  expect(GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(parsed)).toEqual([
     {
       name: 'RegExp',
       count: 1,
