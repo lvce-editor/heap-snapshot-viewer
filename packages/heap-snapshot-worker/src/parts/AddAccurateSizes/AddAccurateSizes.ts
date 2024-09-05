@@ -3,6 +3,7 @@ import * as EdgeFieldType from '../EdgeFieldType/EdgeFieldType.ts'
 import * as EdgeType from '../EdgeType/EdgeType.ts'
 import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
+import * as fs from 'node:fs'
 
 export const addAccurateSizes = (
   nodes: Uint32Array,
@@ -41,6 +42,7 @@ export const addAccurateSizes = (
     }
   }
   let addCount = 0
+  const result: any[] = []
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
@@ -65,11 +67,14 @@ export const addAccurateSizes = (
         default:
           owners[targetId] = kHasMultipleOwners
           addCount++
+          result.push(targetId)
           worklist.push(targetId)
           break
       }
     }
   }
+  fs.writeFileSync('/tmp/file-b.json', JSON.stringify(result, null, 2) + '\n')
+
   console.log('wlist add', addCount)
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
