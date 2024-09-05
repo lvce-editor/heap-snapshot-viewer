@@ -40,6 +40,7 @@ export const addAccurateSizes = (
       worklist.push(i)
     }
   }
+  console.log('inital worklist length', worklist.length)
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
