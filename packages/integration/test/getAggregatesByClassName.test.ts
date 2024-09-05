@@ -20,10 +20,12 @@ test('getAggregatesByClassName', async () => {
   const worker = await testWorker({
     execMap,
   })
-  const heapsnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
-  const heapSnapshotContent = await readFile(heapsnapshotPath, 'utf8')
-  const parsed = await worker.execute('Heapsnapshot.parse', heapSnapshotContent)
-  const aggregates = await worker.execute('Heapsnapshot.getAggregatesByClassName', parsed)
+  const heapSnapshotPath = join(__dirname, '..', 'fixtures', 'syntax.heapsnapshot')
+  const heapSnapshotId = 1
+  const heapSnapshotContent = await readFile(heapSnapshotPath, 'utf8')
+  await worker.execute('HeapSnapshot.create', heapSnapshotId, heapSnapshotContent)
+  await worker.execute('HeapSnapshot.parse', heapSnapshotId)
+  const aggregates = await worker.execute('HeapSnapshot.getAggregatesByClassName', heapSnapshotId)
   const regexCount = findClassCount(aggregates, 'RegExp')
   const systemCount = findClassCount(aggregates, '(system)')
   const compiledCodeCount = findClassCount(aggregates, '(compiled code)')
