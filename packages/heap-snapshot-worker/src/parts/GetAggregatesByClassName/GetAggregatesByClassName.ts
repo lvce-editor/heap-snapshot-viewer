@@ -2,6 +2,15 @@ import * as GetAggregatesByClassNameInternal from '../GetAggregatesByClassNameIn
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 export const getAggregratesByClassName = (id: number) => {
-  const { parsed } = HeapSnapshotState.get(id)
-  return GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(parsed)
+  const { nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings, firstEdgeIndexes } = HeapSnapshotState.get(id)
+  return GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(
+    nodes,
+    nodeFields,
+    nodeTypes,
+    edges,
+    edgeFields,
+    edgeTypes,
+    strings,
+    firstEdgeIndexes,
+  )
 }
