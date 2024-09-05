@@ -1,4 +1,5 @@
 import * as GetNodeClassName from '../GetNodeClassName/GetNodeClassName.ts'
+import * as GetTime from '../GetTime/GetTime.ts'
 
 const toSorted = (items, compare) => {
   return [...items].sort(compare)
@@ -9,6 +10,7 @@ const compareCount = (a, b) => {
 }
 
 export const getAggregratesByClassName = (parsed) => {
+  const start = GetTime.getTime()
   const { parsedNodes } = parsed
   const countMap = Object.create(null)
   for (const node of parsedNodes) {
@@ -26,5 +28,9 @@ export const getAggregratesByClassName = (parsed) => {
     }
   })
   const sorted = toSorted(aggregate, compareCount)
+  const end = GetTime.getTime()
+  const duration = end - start
+  // @ts-ignore
+  sorted.time = duration
   return sorted
 }

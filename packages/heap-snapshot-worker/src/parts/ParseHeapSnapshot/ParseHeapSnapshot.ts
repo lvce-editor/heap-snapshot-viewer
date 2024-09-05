@@ -1,13 +1,12 @@
+import * as GetTime from '../GetTime/GetTime.ts'
 import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.ts'
-
-// TODO move this to heapsnapshot worker
 
 export const parseHeapSnapshot = (content: string) => {
   const heapsnapshot = JSON.parse(content)
   const { snapshot, nodes, edges, strings } = heapsnapshot
   const { meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
-  console.time('parse')
+  const start = GetTime.getTime()
   const parsed = ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,
     node_fields,
@@ -17,6 +16,8 @@ export const parseHeapSnapshot = (content: string) => {
     edge_types[0],
     strings,
   )
-  console.timeEnd('parse')
+  const end = GetTime.getTime()
+  // @ts-ignore
+  parsed.time = end - start
   return parsed
 }
