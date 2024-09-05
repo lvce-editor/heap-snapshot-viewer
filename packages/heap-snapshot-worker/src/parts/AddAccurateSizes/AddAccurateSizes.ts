@@ -4,15 +4,6 @@ import * as EdgeType from '../EdgeType/EdgeType.ts'
 import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
 
-const getNodeType = (nodes: Uint32Array, nodeIndex: number, typeIndex: number, nodeTypes: readonly string[]) => {
-  const value = nodes[nodeIndex + typeIndex]
-  return nodeTypes[value]
-}
-const getEdgeType = (edges: Uint32Array, edgeIndex: number, typeIndex: number, edgeTypes: readonly string[]) => {
-  const value = edges[edgeIndex + typeIndex]
-  return edgeTypes[value]
-}
-
 export const addAccurateSizes = (
   nodes: Uint32Array,
   nodeFields: readonly string[],
@@ -34,12 +25,15 @@ export const addAccurateSizes = (
   const nodeFieldCount = nodeFields.length
   const nodeCount = nodes.length / nodeFieldCount
   const owners = new Uint32Array(nodeCount)
-  console.log({ nodeTypeOffset, edgeCountOffset, edgeToNodeOffset, nodeFieldCount })
+  const nodeHiddenOffset = nodeTypes.indexOf(NodeType.Hidden)
+  const nodeArrayOffset = nodeTypes.indexOf(NodeType.Array)
+  const nodeSyntheticOffset = nodeTypes.indexOf(NodeType.Synthetic)
+  const edgeWeakOffset = nodeTypes.indexOf(EdgeType.Weak)
   for (let i = 0; i < nodeCount; i++) {
     const nodeIndex = i * nodeFieldCount
-    const nodeType = getNodeType(nodes, nodeIndex, nodeTypeOffset, nodeTypes)
+    const nodeType = nodes[nodeIndex + nodeTypeOffset]
     // TODO compare number?
-    if (nodeType === NodeType.Hidden || nodeType === NodeType.Array) {
+    if (nodeType === nodeHiddenOffset || nodeType === nodeArrayOffset) {
       owners[i] = kUnvisited
     } else {
       owners[i] = i
@@ -53,8 +47,8 @@ export const addAccurateSizes = (
     const edgeCount = nodes[id * nodeFieldCount + edgeCountOffset]
     const edgeEnd = edgeStart + edgeCount * edgeFieldCount
     for (let i = edgeStart; i < edgeEnd; i += edgeFieldCount) {
-      const edgeType = getEdgeType(edges, i, edgeTypeOffset, edgeTypes)
-      if (edgeType === EdgeType.Weak) {
+      const edgeType = edges[i + edgeTypeOffset]
+      if (edgeType === edgeWeakOffset) {
         continue
       }
       const targetId = edges[i + edgeToNodeOffset]
@@ -84,8 +78,8 @@ export const addAccurateSizes = (
       default:
         const ownedNodeIndex = i * nodeFieldCount
         const ownerNodeIndex = ownerId * nodeFieldCount
-        const ownerType = getNodeType(nodes, ownerNodeIndex, nodeTypeOffset, nodeTypes)
-        if (ownerType === NodeType.Synthetic || ownerNodeIndex === 0) {
+        const ownerType = nodes[ownerNodeIndex + nodeTypeOffset]
+        if (ownerType === nodeSyntheticOffset || ownerNodeIndex === 0) {
           break
         }
         const sizeToTransfer = nodes[ownedNodeIndex + nodeSizeOffset]
