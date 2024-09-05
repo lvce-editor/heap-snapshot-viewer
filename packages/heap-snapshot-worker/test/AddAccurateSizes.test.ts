@@ -35,7 +35,7 @@ test('add size to array owner', () => {
       [2, 0, 2], // edge from object to array
     ].flat(1),
   )
-  const firstEdgeIndexes = new Uint32Array([0])
+  const firstEdgeIndexes = new Uint32Array([0, 0, 0])
   const strings = []
   AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings, firstEdgeIndexes)
   const sizeOffset = nodeFields.indexOf('self_size')

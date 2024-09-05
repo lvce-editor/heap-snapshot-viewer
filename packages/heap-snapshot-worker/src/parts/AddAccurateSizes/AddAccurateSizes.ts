@@ -51,8 +51,9 @@ export const addAccurateSizes = (
     const id = worklist.pop() as number
     const owner = owners[id]
     const edgeStart = firstEdgeIndexes[id]
-    const edgeCount = nodes[id + edgeCountOffset]
+    const edgeCount = nodes[id * nodeFieldCount + edgeCountOffset]
     const edgeEnd = edgeStart + edgeCount * edgeFieldCount
+    console.log({ edgeStart, edgeCount, id, edgeCountOffset, edges })
     for (let i = edgeStart; i < edgeEnd; i += edgeFieldCount) {
       const edgeType = getEdgeType(edges, i, edgeTypeOffset, edgeTypes)
       if (edgeType === EdgeType.Weak) {
@@ -92,7 +93,7 @@ export const addAccurateSizes = (
         }
         const sizeToTransfer = nodes[ownedNodeIndex + nodeSizeOffset]
         nodes[ownedNodeIndex + nodeSizeOffset] = 0
-        nodes[ownerNodeIndex + nodeSizeOffset] = sizeToTransfer
+        nodes[ownerNodeIndex + nodeSizeOffset] += sizeToTransfer
         break
     }
   }
