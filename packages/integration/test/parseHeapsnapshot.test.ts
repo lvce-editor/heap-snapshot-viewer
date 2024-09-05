@@ -15,6 +15,7 @@ test('parseHeapSnapshot', async () => {
   const heapSnapshotContent = await readFile(heapSnapshotPath, 'utf8')
   const heapSnapshotId = 1
   await worker.execute('HeapSnapshot.create', heapSnapshotId, heapSnapshotContent)
+  await worker.execute('HeapSnapshot.preparse', heapSnapshotId)
   await worker.execute('HeapSnapshot.parse', heapSnapshotId)
   const { parsed } = await worker.execute('HeapSnapshot.get', heapSnapshotId)
   expect(parsed.parsedNodes).toBeDefined()
