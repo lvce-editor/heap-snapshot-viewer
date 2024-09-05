@@ -1,5 +1,5 @@
-import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 import * as EdgeFieldType from '../EdgeFieldType/EdgeFieldType.ts'
+import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 
 export const parseHeapSnapshotInternal = (
   nodes: Uint32Array,
