@@ -35,10 +35,9 @@ test('parseHeapSnapshotInternalEdges', () => {
       [0, 0, 0],
     ].flat(1),
   )
-  const strings = ['test']
-  expect(
-    ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings),
-  ).toEqual({
-    firstEdgeIndexes: new Uint32Array([0, 2]),
-  })
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes)).toEqual(
+    {
+      firstEdgeIndexes: new Uint32Array([0, 2]),
+    },
+  )
 })

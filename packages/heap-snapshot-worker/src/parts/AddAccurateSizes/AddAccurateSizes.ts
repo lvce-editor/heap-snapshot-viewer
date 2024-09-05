@@ -20,7 +20,6 @@ export const addAccurateSizes = (
   edges: Uint32Array,
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
-  strings: readonly string[],
   firstEdgeIndexes: Uint32Array,
 ) => {
   const kUnvisited = 0xffffffff
