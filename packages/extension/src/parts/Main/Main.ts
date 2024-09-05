@@ -52,6 +52,11 @@ const webViewProvider = {
       time: aggregatesEnd - aggregatesStart,
     })
 
+    timings.push({
+      name: 'total',
+      time: aggregatesEnd - startReadFile,
+    })
+
     await HeapSnapshotWorker.invoke('HeapSnapshot.dispose', heapSnapshotId)
     await webView.invoke('initialize', aggregrates, timings)
     // TODO support connecting state to webview
