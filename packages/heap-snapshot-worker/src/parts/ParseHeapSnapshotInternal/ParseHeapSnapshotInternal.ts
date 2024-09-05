@@ -1,5 +1,5 @@
 import * as AddAccurateSizes from '../AddAccurateSizes/AddAccurateSizes.ts'
-import * as EdgeFieldType from '../EdgeFieldType/EdgeFieldType.ts'
+import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 
 export const parseHeapSnapshotInternal = (
@@ -11,7 +11,7 @@ export const parseHeapSnapshotInternal = (
   edgeTypes: readonly string[],
 ) => {
   const nodeFieldCount = nodeFields.length
-  const edgeCountOffset = nodeFields.indexOf(EdgeFieldType.EdgeCount)
+  const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
   const firstEdgeIndexes = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(nodes, edgeCountOffset, nodeFieldCount)
   AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, firstEdgeIndexes)
   return {
