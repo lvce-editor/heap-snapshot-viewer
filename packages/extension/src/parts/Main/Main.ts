@@ -11,10 +11,16 @@ import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts
 const webViewProvider = {
   id: 'builtin.heap-snapshot-viewer',
   async create(webView, uri) {
+    const timings: any[] = []
+    const startReadFile = performance.now()
     // @ts-ignore
     const content = await vscode.readFile(uri)
+    const endReadFile = performance.now()
+    timings.push({
+      name: 'read-file',
+      time: endReadFile - startReadFile,
+    })
     // TODO use heapsnapshot worker to parse heapsnapshot
-    const timings: any[] = []
     const parsed = await HeapSnapshotWorker.invoke('Heapsnapshot.parse', content)
     timings.push({
       name: 'parse',
