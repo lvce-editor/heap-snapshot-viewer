@@ -1,4 +1,4 @@
-import { test } from '@jest/globals'
+import { test, expect } from '@jest/globals'
 import * as AddAccurateSizes from '../src/parts/AddAccurateSizes/AddAccurateSizes.ts'
 
 const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']
@@ -38,4 +38,9 @@ test('add size to array owner', () => {
   const firstEdgeIndexes = new Uint32Array([0])
   const strings = []
   AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings, firstEdgeIndexes)
+  const sizeOffset = nodeFields.indexOf('self_size')
+  const nodeFieldCount = nodeFields.length
+  expect(nodes[0 * nodeFieldCount + sizeOffset]).toBe(1)
+  expect(nodes[1 * nodeFieldCount + sizeOffset]).toBe(3)
+  expect(nodes[2 * nodeFieldCount + sizeOffset]).toBe(0)
 })
