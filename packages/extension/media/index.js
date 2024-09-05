@@ -52,7 +52,7 @@ const setContent = (parsedNodes) => {
   app.append(table)
 }
 
-const initialize = (parsedNodes) => {
+const initialize = (parsedNodes, timings) => {
   const app = document.createElement('div')
   app.className = 'App'
 
@@ -67,6 +67,15 @@ const initialize = (parsedNodes) => {
   header.append(filterInput)
   app.append(header)
   document.body.append(app)
+  const timingsElement = document.createElement('ul')
+  timingsElement.className = 'Timings'
+  for (const item of timings) {
+    const listItem = document.createElement('li')
+    listItem.textContent = `${item.name}: ${item.time.toFixed(2)}`
+    timingsElement.append(listItem)
+  }
+  app.append(timingsElement)
+
   setContent(parsedNodes)
 }
 
