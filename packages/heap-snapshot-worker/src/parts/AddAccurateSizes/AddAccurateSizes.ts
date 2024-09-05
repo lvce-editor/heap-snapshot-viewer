@@ -45,6 +45,7 @@ export const addAccurateSizes = (
       worklist.push(i)
     }
   }
+  console.log({ edgeFieldCount })
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
