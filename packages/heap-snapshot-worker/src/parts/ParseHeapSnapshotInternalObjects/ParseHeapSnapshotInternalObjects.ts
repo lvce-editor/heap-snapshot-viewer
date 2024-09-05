@@ -12,7 +12,6 @@ export const parseHeapSnapshotObjects = (
   indexMultiplier,
   strings,
 ) => {
-  Assert.array(values)
   Assert.array(valueFields)
   Assert.array(valueTypes)
   const parsed: any[] = []

@@ -7,10 +7,10 @@ export const preparseHeapSnapshot = (id: number) => {
   const { meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
   HeapSnapshotState.add(id, {
-    nodes,
+    nodes: new Uint32Array(nodes),
     nodeFields: node_fields,
     nodeTypes: node_types[0],
-    edges,
+    edges: new Uint32Array(edges),
     edgeFields: edge_fields,
     edgeTypes: edge_types[0],
     strings,

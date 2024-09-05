@@ -6,10 +6,8 @@ import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNod
 import * as AddAccurateSizes from '../AddAccurateSizes/AddAccurateSizes.ts'
 
 export const parseHeapSnapshotInternal = (nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings) => {
-  Assert.array(nodes)
   Assert.array(nodeFields)
   Assert.array(nodeTypes)
-  Assert.array(edges)
   Assert.array(edgeFields)
   Assert.array(edgeTypes)
   Assert.array(strings)
