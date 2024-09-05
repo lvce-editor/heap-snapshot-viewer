@@ -35,8 +35,8 @@ export const addAccurateSizes = (
   const nodeFieldCount = nodeFields.length
   const nodeCount = nodes.length / nodeFieldCount
   const owners = new Uint32Array(nodeCount)
-  let nodeIndex = 0
   for (let i = 0; i < nodeCount; i++) {
+    const nodeIndex = i * nodeFieldCount
     const nodeType = getNodeType(nodes, nodeIndex, typeIndex, nodeTypes)
     // TODO compare number?
     if (nodeType === NodeType.Hidden || nodeType === NodeType.Array) {
@@ -45,7 +45,6 @@ export const addAccurateSizes = (
       owners[i] = i
       worklist.push(i)
     }
-    nodeIndex += nodeFieldCount
   }
   while (worklist.length > 0) {
     const id = worklist.pop() as number
@@ -85,7 +84,7 @@ export const addAccurateSizes = (
       default:
         const ownedNodeIndex = i * nodeFieldCount
         const ownerNodeIndex = ownerId * nodeFieldCount
-        const ownerType = getNodeType(nodes, nodeIndex, typeIndex, nodeTypes)
+        const ownerType = getNodeType(nodes, ownerNodeIndex, typeIndex, nodeTypes)
         if (ownerType === NodeType.Synthetic || ownerNodeIndex === 0) {
           break
         }
