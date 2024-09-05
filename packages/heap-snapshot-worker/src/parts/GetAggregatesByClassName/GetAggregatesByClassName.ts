@@ -1,5 +1,6 @@
 import * as GetNodeClassName from '../GetNodeClassName/GetNodeClassName.ts'
 import * as GetTime from '../GetTime/GetTime.ts'
+import * as IsTest from '../IsTest/IsTest.ts'
 
 const toSorted = (items, compare) => {
   return [...items].sort(compare)
@@ -30,7 +31,9 @@ export const getAggregratesByClassName = (parsed) => {
   const sorted = toSorted(aggregate, compareCount)
   const end = GetTime.getTime()
   const duration = end - start
-  // @ts-ignore
-  sorted.time = duration
+  if (!IsTest.isTest) {
+    // @ts-ignore
+    sorted.time = duration
+  }
   return sorted
 }
