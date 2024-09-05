@@ -40,7 +40,7 @@ export const addAccurateSizes = (
       worklist.push(i)
     }
   }
-  console.log('inital worklist length', worklist.length)
+  let addCount = 0
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
@@ -64,11 +64,13 @@ export const addAccurateSizes = (
           break
         default:
           owners[targetId] = kHasMultipleOwners
+          addCount++
           worklist.push(targetId)
           break
       }
     }
   }
+  console.log('wlist add', addCount)
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
     switch (ownerId) {
