@@ -1,6 +1,7 @@
 import * as GetNodeClassName from '../GetNodeClassName/GetNodeClassName.ts'
 import * as GetTime from '../GetTime/GetTime.ts'
 import * as IsTest from '../IsTest/IsTest.ts'
+import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 
 const toSorted = (items, compare) => {
   return [...items].sort(compare)
@@ -23,9 +24,9 @@ export const getAggregratesByClassNameInternal = (
   const start = GetTime.getTime()
   const countMap = Object.create(null)
   const nodeFieldCount = nodeFields.length
-  const selfSizeOffset = nodeFields.indexOf('self_size')
-  const nodeTypeOffset = nodeFields.indexOf('type')
-  const nodeNameOffset = nodeFields.indexOf('name')
+  const selfSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
+  const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
+  const nodeNameOffset = nodeFields.indexOf(NodeFieldType.Name)
   for (let i = 0; i < nodes.length; i += nodeFieldCount) {
     const selfSize = nodes[i + selfSizeOffset]
     if (selfSize === 0) {
