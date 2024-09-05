@@ -3,15 +3,31 @@ import * as EdgeType from '../EdgeType/EdgeType.ts'
 import type { Graph } from '../Graph/Graph.ts'
 import type { Node } from '../Node/Node.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
+import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 
-export const addAccurateSizes = (graph: Graph, nodes: readonly Node[]) => {
+const getNodeType = (nodes: Uint32Array, i: number, typeIndex: number, nodeTypes: readonly string[]) => {
+  const value = nodes[i + typeIndex]
+  return nodeTypes[value]
+}
+
+export const addAccurateSizes = (
+  nodes: Uint32Array,
+  nodeFields: readonly string[],
+  nodeTypes: readonly string[],
+  edges: Uint32Array,
+  edgeFields: readonly string[],
+  edgeTypes: readonly string[],
+  strings: readonly string[],
+) => {
   const owners = new Uint32Array(nodes.length)
   const kUnvisited = 0xffffffff
   const kHasMultipleOwners = 0xfffffffe
   const worklist: number[] = []
+  const typeIndex = nodeFields.indexOf(NodeFieldType.Type)
   for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i]
-    if (node.type === NodeType.Hidden || node.type === NodeType.Array) {
+    const nodeType = getNodeType(nodes, i, typeIndex, nodeTypes)
+    // TODO compare number?
+    if (nodeType === NodeType.Hidden || nodeType === NodeType.Array) {
       owners[i] = kUnvisited
     } else {
       owners[i] = i
