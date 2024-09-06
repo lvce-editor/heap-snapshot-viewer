@@ -44,25 +44,13 @@ export const addAccurateSizes = (
     }
   }
   let addCount = 0
-  const result: any[] = []
-
-  console.log({ firstEdgeIndexes })
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
     const edgeStart = firstEdgeIndexes[id]
     const edgeCount = nodes[id * nodeFieldCount + edgeCountOffset]
     const edgeEnd = edgeStart + edgeCount * edgeFieldCount
-    const edgesObject: any[] = []
     for (let i = edgeStart; i < edgeEnd; i += edgeFieldCount) {
-      const edgeName = edges[i + edgeNameOffset]
-      const edgeNameString = strings[edgeName]
-      const toIndex = edges[i + edgeToNodeOffset]
-      edgesObject.push({
-        index: toIndex,
-        name: edgeNameString,
-      })
-
       const edgeType = edges[i + edgeTypeOffset]
       if (edgeType === edgeWeakOffset) {
         continue
@@ -85,15 +73,8 @@ export const addAccurateSizes = (
           break
       }
     }
-    result.push({
-      owner,
-      edges: edgesObject,
-    })
   }
 
-  fs.writeFileSync('/tmp/edge-and-node-b.json', JSON.stringify(result, null, 2) + '\n')
-
-  console.log('wlist add', addCount)
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
     switch (ownerId) {
