@@ -32,7 +32,6 @@ export const addAccurateSizes = (
   for (let i = 0; i < nodeCount; i++) {
     const nodeIndex = i * nodeFieldCount
     const nodeType = nodes[nodeIndex + nodeTypeOffset]
-    // TODO compare number?
     if (nodeType === nodeHiddenOffset || nodeType === nodeArrayOffset) {
       owners[i] = kUnvisited
     } else {
@@ -40,7 +39,6 @@ export const addAccurateSizes = (
       worklist.push(i)
     }
   }
-  let addCount = 0
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
@@ -64,14 +62,11 @@ export const addAccurateSizes = (
           break
         default:
           owners[targetId] = kHasMultipleOwners
-          addCount++
-          // result.push(targetId)
           worklist.push(targetId)
           break
       }
     }
   }
-
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
     switch (ownerId) {
