@@ -3,7 +3,6 @@ import * as EdgeFieldType from '../EdgeFieldType/EdgeFieldType.ts'
 import * as EdgeType from '../EdgeType/EdgeType.ts'
 import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
-import * as fs from 'node:fs'
 
 export const addAccurateSizes = (
   nodes: Uint32Array,
@@ -13,7 +12,6 @@ export const addAccurateSizes = (
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
   firstEdgeIndexes: Uint32Array,
-  strings: readonly string[],
 ) => {
   const kUnvisited = 0xffffffff
   const kHasMultipleOwners = 0xfffffffe
@@ -22,7 +20,6 @@ export const addAccurateSizes = (
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
   const edgeFieldCount = edgeFields.length
   const edgeTypeOffset = edgeFields.indexOf(EdgeFieldType.Type)
-  const edgeNameOffset = edgeFields.indexOf(EdgeFieldType.Name)
   const edgeToNodeOffset = edgeFields.indexOf(EdgeFieldType.ToNode)
   const nodeSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeFieldCount = nodeFields.length
