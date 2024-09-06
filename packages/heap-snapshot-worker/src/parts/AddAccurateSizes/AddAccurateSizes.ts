@@ -46,6 +46,7 @@ export const addAccurateSizes = (
   let addCount = 0
   const result: any[] = []
 
+  console.log({ firstEdgeIndexes })
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
@@ -79,7 +80,7 @@ export const addAccurateSizes = (
         default:
           owners[targetId] = kHasMultipleOwners
           addCount++
-          result.push(targetId)
+          // result.push(targetId)
           worklist.push(targetId)
           break
       }
