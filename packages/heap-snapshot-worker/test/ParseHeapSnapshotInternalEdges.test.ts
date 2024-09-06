@@ -10,7 +10,8 @@ test('parseHeapSnapshotInternalEdges', () => {
   )
   const edgeCountOffset = 3
   const nodeFieldCount = 7
-  expect(ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(nodes, edgeCountOffset, nodeFieldCount)).toEqual(
-    new Uint32Array([0, 2]),
-  )
+  const edgeFieldCount = 3
+  expect(
+    ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(nodes, edgeCountOffset, nodeFieldCount, edgeFieldCount),
+  ).toEqual(new Uint32Array([0, 6]))
 })

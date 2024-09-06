@@ -10,7 +10,7 @@ export const parseHeapSnapshotInternal = (
   edges: Uint32Array,
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
-  strings: readonly string[],
+  strings?: readonly string[] = [],
 ) => {
   const nodeFieldCount = nodeFields.length
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
