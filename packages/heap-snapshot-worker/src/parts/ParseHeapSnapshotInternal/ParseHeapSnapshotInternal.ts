@@ -10,11 +10,17 @@ export const parseHeapSnapshotInternal = (
   edges: Uint32Array,
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
-  strings?: readonly string[] = [],
+  strings: readonly string[] = [],
 ) => {
   const nodeFieldCount = nodeFields.length
+  const edgeFieldCount = edgeFields.length
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
-  const firstEdgeIndexes = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(nodes, edgeCountOffset, nodeFieldCount)
+  const firstEdgeIndexes = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
+    nodes,
+    edgeCountOffset,
+    nodeFieldCount,
+    edgeFieldCount,
+  )
   // const result: any[] = []
   // for (let i = 0; i < nodes.length; i += nodeFieldCount) {
   //   const idOffset = 2
