@@ -10,6 +10,7 @@ export const parseHeapSnapshot = (id: number) => {
     edges,
     edgeFields,
     edgeTypes,
+    strings,
   )
   HeapSnapshotState.add(id, {
     nodes,

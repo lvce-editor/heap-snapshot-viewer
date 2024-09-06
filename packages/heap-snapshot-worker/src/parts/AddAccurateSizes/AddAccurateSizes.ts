@@ -13,6 +13,7 @@ export const addAccurateSizes = (
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
   firstEdgeIndexes: Uint32Array,
+  strings: readonly string[],
 ) => {
   const kUnvisited = 0xffffffff
   const kHasMultipleOwners = 0xfffffffe
@@ -21,6 +22,7 @@ export const addAccurateSizes = (
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
   const edgeFieldCount = edgeFields.length
   const edgeTypeOffset = edgeFields.indexOf(EdgeFieldType.Type)
+  const edgeNameOffset = edgeFields.indexOf(EdgeFieldType.Name)
   const edgeToNodeOffset = edgeFields.indexOf(EdgeFieldType.ToNode)
   const nodeSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeFieldCount = nodeFields.length
@@ -42,8 +44,7 @@ export const addAccurateSizes = (
     }
   }
   let addCount = 0
-  const result: any[] = [...worklist]
-  fs.writeFileSync('/tmp/worklist-b.json', JSON.stringify(result, null, 2) + '\n')
+  const result: any[] = []
 
   while (worklist.length > 0) {
     const id = worklist.pop() as number
@@ -51,7 +52,16 @@ export const addAccurateSizes = (
     const edgeStart = firstEdgeIndexes[id]
     const edgeCount = nodes[id * nodeFieldCount + edgeCountOffset]
     const edgeEnd = edgeStart + edgeCount * edgeFieldCount
+    const edgesObject: any[] = []
     for (let i = edgeStart; i < edgeEnd; i += edgeFieldCount) {
+      const edgeName = edges[i + edgeNameOffset]
+      const edgeNameString = strings[edgeName]
+      const toIndex = edges[i + edgeToNodeOffset]
+      edgesObject.push({
+        index: toIndex,
+        name: edgeNameString,
+      })
+
       const edgeType = edges[i + edgeTypeOffset]
       if (edgeType === edgeWeakOffset) {
         continue
@@ -74,7 +84,13 @@ export const addAccurateSizes = (
           break
       }
     }
+    result.push({
+      owner,
+      edges: edgesObject,
+    })
   }
+
+  fs.writeFileSync('/tmp/edge-and-node-b.json', JSON.stringify(result, null, 2) + '\n')
 
   console.log('wlist add', addCount)
   for (let i = 0; i < nodeCount; i++) {

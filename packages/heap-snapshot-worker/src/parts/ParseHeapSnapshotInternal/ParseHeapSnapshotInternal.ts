@@ -10,6 +10,7 @@ export const parseHeapSnapshotInternal = (
   edges: Uint32Array,
   edgeFields: readonly string[],
   edgeTypes: readonly string[],
+  strings: readonly string[],
 ) => {
   const nodeFieldCount = nodeFields.length
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
@@ -26,7 +27,7 @@ export const parseHeapSnapshotInternal = (
   //   })
   // }
   // fs.writeFileSync('/tmp/b.json', JSON.stringify(result, null, 2) + '\n')
-  AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, firstEdgeIndexes)
+  AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, firstEdgeIndexes, strings)
   return {
     firstEdgeIndexes,
   }
