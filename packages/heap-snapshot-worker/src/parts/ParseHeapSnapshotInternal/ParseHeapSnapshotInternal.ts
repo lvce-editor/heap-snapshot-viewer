@@ -1,29 +1,26 @@
-import * as Assert from '../Assert/Assert.ts'
-import * as CleanNodes from '../CleanNodes/CleanNodes.ts'
-import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
-import * as ParseHeapSnapshotInternalGraph from '../ParseHeapSnapshotInternalGraph/ParseHeapSnapshotInternalGraph.ts'
-import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
 import * as AddAccurateSizes from '../AddAccurateSizes/AddAccurateSizes.ts'
+import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
+import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 
-export const parseHeapSnapshotInternal = (nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings) => {
-  Assert.array(nodeFields)
-  Assert.array(nodeTypes)
-  Assert.array(edgeFields)
-  Assert.array(edgeTypes)
-  Assert.array(strings)
-  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, nodeFields, nodeTypes, strings)
-  const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
-    edges,
-    edgeFields,
-    edgeTypes,
-    nodeFields.length,
-    strings,
+export const parseHeapSnapshotInternal = (
+  nodes: Uint32Array,
+  nodeFields: readonly string[],
+  nodeTypes: readonly string[],
+  edges: Uint32Array,
+  edgeFields: readonly string[],
+  edgeTypes: readonly string[],
+) => {
+  const nodeFieldCount = nodeFields.length
+  const edgeFieldCount = edgeFields.length
+  const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
+  const firstEdgeIndexes = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
+    nodes,
+    edgeCountOffset,
+    nodeFieldCount,
+    edgeFieldCount,
   )
-  const graph = ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(parsedNodes, parsedEdges)
-  AddAccurateSizes.addAccurateSizes(graph, parsedNodes)
-  const cleanNodes = CleanNodes.cleanNode(parsedNodes)
+  AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, firstEdgeIndexes)
   return {
-    parsedNodes: cleanNodes,
-    graph,
+    firstEdgeIndexes,
   }
 }

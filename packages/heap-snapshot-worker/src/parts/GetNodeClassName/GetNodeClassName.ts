@@ -1,8 +1,7 @@
-import type { Node } from '../Node/Node.ts'
 import * as NodeType from '../NodeType/NodeType.ts'
 
-export const getNodeClassName = (node: Node) => {
-  switch (node.type) {
+export const getNodeClassName = (nodeType: string, nodeName: string) => {
+  switch (nodeType) {
     case NodeType.Hidden:
       return '(system)'
     case NodeType.Code:
@@ -15,8 +14,8 @@ export const getNodeClassName = (node: Node) => {
       return '(string)'
     case NodeType.Native:
     case NodeType.Object:
-      return node.name
+      return nodeName
     default:
-      return `(${node.type})`
+      return `(${nodeType})`
   }
 }
