@@ -67,7 +67,7 @@ export const addAccurateSizes = (
       if (edgeType === edgeWeakOffset) {
         continue
       }
-      const targetId = edges[i + edgeToNodeOffset]
+      const targetId = edges[i + edgeToNodeOffset] / nodeFieldCount
       switch (owners[targetId]) {
         case kUnvisited:
           owners[targetId] = owner
