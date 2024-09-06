@@ -42,7 +42,9 @@ export const addAccurateSizes = (
     }
   }
   let addCount = 0
-  const result: any[] = []
+  const result: any[] = [...worklist]
+  fs.writeFileSync('/tmp/worklist-b.json', JSON.stringify(result, null, 2) + '\n')
+
   while (worklist.length > 0) {
     const id = worklist.pop() as number
     const owner = owners[id]
@@ -73,7 +75,6 @@ export const addAccurateSizes = (
       }
     }
   }
-  fs.writeFileSync('/tmp/file-b.json', JSON.stringify(result, null, 2) + '\n')
 
   console.log('wlist add', addCount)
   for (let i = 0; i < nodeCount; i++) {
