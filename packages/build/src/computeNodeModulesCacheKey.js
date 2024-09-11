@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const root = join(__dirname, '..')
+const root = join(__dirname, '..', '..', '..')
 
 const getPackageLocations = () => {
   const packageLocations = []
@@ -25,7 +25,7 @@ const locations = [
   '.github/workflows/pr.yml',
   '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
-  'scripts/computeNodeModulesCacheKey.js',
+  'packages/build/src/computeNodeModulesCacheKey.js',
 ]
 
 const packagesFolder = join(root, 'packages')
