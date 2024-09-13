@@ -10,7 +10,21 @@
       "id": "builtin.heap-snapshot-viewer",
       "rpc": true,
       "path": "media/index.html",
-      "selector": [".heapsnapshot"]
+      "selector": [".heapsnapshot"],
+      "elements": [
+        {
+          "type": "title",
+          "value": "Heapsnapshot Viewer"
+        },
+        {
+          "type": "script",
+          "path": "media/index.js"
+        },
+        {
+          "type": "css",
+          "path": "media/index.css"
+        }
+      ]
     }
   ]
 }
