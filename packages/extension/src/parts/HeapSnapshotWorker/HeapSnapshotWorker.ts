@@ -1,6 +1,11 @@
-import * as GetOrCreateWorker from '../GetOrCreateWorker/GetOrCreateWorker.ts'
-import * as LaunchHeapSnapshotWorker from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
+import * as Command from '../Command/Command.ts'
 
-const { invoke } = GetOrCreateWorker.getOrCreateWorker(LaunchHeapSnapshotWorker.launchHeapSnapshotWorker)
+// @ts-ignore
+const rpc = vscode.createRpc({
+  id: 'builtin.prettier.prettier-worker',
+  execute: Command.execute,
+})
 
-export { invoke }
+export const invoke = (method, ...params) => {
+  return rpc.invoke(method, ...params)
+}
