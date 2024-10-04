@@ -5,6 +5,15 @@
   "browser": "src/heapSnapshotViewerMain.ts",
   "activation": ["onWebView:builtin.heap-snapshot-viewer"],
   "languages": [],
+  "rpc": [
+    {
+      "id": "builtin.heap-snapshot-viewer.heap-snapshot-worker",
+      "type": "web-worker",
+      "name": "Heap Snapshot Worker",
+      "url": "../heap-snapshot-worker/src/heapSnapshotWorkerMain.ts",
+      "contentSecurityPolicy": ["default-src 'none'"]
+    }
+  ],
   "webViews": [
     {
       "id": "builtin.heap-snapshot-viewer",
