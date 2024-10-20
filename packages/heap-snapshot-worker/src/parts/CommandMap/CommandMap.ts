@@ -2,6 +2,7 @@ import * as CreateHeapSnapshot from '../CreateHeapSnapshot/CreateHeapSnapshot.ts
 import * as DisposeHeapSnapshot from '../DisposeHeapSnapshot/DisposeHeapSnapshot.ts'
 import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggregatesByClassName.ts'
 import * as GetHeapSnapshot from '../GetHeapSnapshot/GetHeapSnapshot.ts'
+import * as GetStatistics from '../GetStatistics/GetStatistics.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
 
@@ -12,4 +13,5 @@ export const commandMap = {
   'HeapSnapshot.getAggregatesByClassName': GetAggregatesByClassName.getAggregratesByClassName,
   'HeapSnapshot.parse': ParseHeapSnapshot.parseHeapSnapshot,
   'HeapSnapshot.preparse': PreparseHeapSnapshot.preparseHeapSnapshot,
+  'HeapSnapshot.getStatistics': GetStatistics.getStatistics,
 }
