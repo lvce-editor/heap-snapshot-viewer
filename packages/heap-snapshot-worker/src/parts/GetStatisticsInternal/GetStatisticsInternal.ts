@@ -7,7 +7,6 @@ export const getStatisicsInternal = (
   nodeTypes: readonly string[],
   strings: readonly string[],
 ) => {
-  const countMap = Object.create(null)
   const nodeFieldCount = nodeFields.length
   const selfSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
@@ -26,10 +25,6 @@ export const getStatisicsInternal = (
     const nodeName = nodes[i + nodeNameOffset]
     const nodeTypeString = nodeTypes[nodeType]
     const nodeNameString = strings[nodeName]
-    // if(nodeType === )
-    const name = GetNodeClassName.getNodeClassName(nodeTypeString, nodeNameString)
-    countMap[name] ||= 0
-    countMap[name]++
   }
 
   return {
