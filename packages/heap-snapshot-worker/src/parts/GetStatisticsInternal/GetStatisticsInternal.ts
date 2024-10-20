@@ -1,5 +1,5 @@
-import * as GetNodeClassName from '../GetNodeClassName/GetNodeClassName.ts'
 import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
+import * as NodeType from '../NodeType/NodeType.ts'
 
 export const getStatisicsInternal = (
   nodes: Uint32Array,
@@ -11,6 +11,11 @@ export const getStatisicsInternal = (
   const selfSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
   const nodeNameOffset = nodeFields.indexOf(NodeFieldType.Name)
+  const nodeNativeType = nodeTypes.indexOf(NodeType.Native)
+  const nodeStringType = nodeTypes.indexOf(NodeType.String)
+  const nodeConcatenatedStringType = nodeTypes.indexOf(NodeType.ConcatenatedString)
+  const nodeSlicedStringType = nodeTypes.indexOf(NodeType.SlicedString)
+  const nodeCodeType = nodeTypes.indexOf(NodeType.Code)
   let sizeNative = 0
   let sizeCode = 0
   let sizeStrings = 0
@@ -23,8 +28,19 @@ export const getStatisicsInternal = (
     }
     const nodeType = nodes[i + nodeTypeOffset]
     const nodeName = nodes[i + nodeNameOffset]
-    const nodeTypeString = nodeTypes[nodeType]
-    const nodeNameString = strings[nodeName]
+    if (nodeType === nodeNativeType) {
+      sizeNative += selfSize
+    } else if (nodeType === nodeCodeType) {
+      sizeCode += selfSize
+    } else if (nodeType === nodeSlicedStringType || nodeType === nodeConcatenatedStringType || nodeType === nodeStringType) {
+      sizeStrings += selfSize
+    } else {
+      const name = strings[nodeName]
+      if (name === 'Array') {
+        // TODO compute size of array
+        // sizeJSArrays+=
+      }
+    }
   }
 
   return {
