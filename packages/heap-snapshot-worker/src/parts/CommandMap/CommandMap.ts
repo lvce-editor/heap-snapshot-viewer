@@ -5,13 +5,15 @@ import * as GetHeapSnapshot from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as GetStatistics from '../GetStatistics/GetStatistics.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
+import * as SaveState from '../SaveState/SaveState.ts'
 
 export const commandMap = {
   'HeapSnapshot.create': CreateHeapSnapshot.createHeapSnapshot,
   'HeapSnapshot.dispose': DisposeHeapSnapshot.disposeHeapSnapshot,
   'HeapSnapshot.get': GetHeapSnapshot.getHeapSnapshot,
   'HeapSnapshot.getAggregatesByClassName': GetAggregatesByClassName.getAggregratesByClassName,
+  'HeapSnapshot.getStatistics': GetStatistics.getStatistics,
   'HeapSnapshot.parse': ParseHeapSnapshot.parseHeapSnapshot,
   'HeapSnapshot.preparse': PreparseHeapSnapshot.preparseHeapSnapshot,
-  'HeapSnapshot.getStatistics': GetStatistics.getStatistics,
+  'HeapSnapshot.saveState': SaveState.saveState,
 }
