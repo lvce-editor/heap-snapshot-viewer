@@ -32,13 +32,6 @@ fs.cpSync(join(heapSnapshotWorker, 'src'), join(root, 'dist', 'heap-snapshot-wor
   recursive: true,
 })
 
-const workerUrlFilePath = path.join(root, 'dist', 'src', 'parts', 'HeapSnapshotWorkerUrl', 'HeapSnapshotWorkerUrl.ts')
-await replace({
-  path: workerUrlFilePath,
-  occurrence: 'src/heapSnapshotWorkerMain.ts',
-  replacement: 'dist/heapSnapshotWorkerMain.js',
-})
-
 const assetDirPath = path.join(root, 'dist', 'src', 'parts', 'AssetDir', 'AssetDir.ts')
 await replace({
   path: assetDirPath,
