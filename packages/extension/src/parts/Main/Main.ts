@@ -8,6 +8,9 @@ import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts
 // 4. read file, send file directly from shared process to heapsnapshot worker
 // 5. parse heapsnapshot file
 // 6. send visible regions from heapsnapshot worker to iframe
+
+const heapSnapshotId = 1
+
 const webViewProvider = {
   id: 'builtin.heap-snapshot-viewer',
   async create(webView, uri) {
@@ -21,7 +24,6 @@ const webViewProvider = {
       time: endReadFile - startReadFile,
     })
     // TODO use heapsnapshot worker to parse heapsnapshot
-    const heapSnapshotId = 1
     const createTime = performance.now()
     await HeapSnapshotWorker.invoke('HeapSnapshot.create', heapSnapshotId, content)
     const createTimeEnd = performance.now()
@@ -57,6 +59,7 @@ const webViewProvider = {
       time: aggregatesEnd - startReadFile,
     })
 
+    await HeapSnapshotWorker.invoke('HeapSnapshot.getStatistics', heapSnapshotId)
     await HeapSnapshotWorker.invoke('HeapSnapshot.dispose', heapSnapshotId)
     await webView.invoke('initialize', aggregrates, timings)
     // TODO support connecting state to webview
@@ -64,6 +67,10 @@ const webViewProvider = {
     this.aggregates = aggregrates
     // @ts-ignore
     this.webView = webView
+  },
+  async saveState() {
+    const state = await HeapSnapshotWorker.invoke('HeapSnapshot.saveState', heapSnapshotId)
+    return state
   },
   async open(uri, webView) {
     // const content = await vscode.readFile(uri)
