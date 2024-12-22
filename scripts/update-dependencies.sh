@@ -29,8 +29,9 @@ function updateDependencies {
                                     updateDependencies &&
 cd packages/build                && updateDependencies && cd ../../ &&
 cd packages/extension            && updateDependencies && cd ../../ &&
-cd packages/integration          && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
+cd packages/integration          && updateDependencies && cd ../../ &&
+cd packages/server               && updateDependencies && cd ../../ &&
 
 echo "Great Success!"
 

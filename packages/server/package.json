@@ -1,0 +1,13 @@
+{
+  "name": "heap-snapshot-server",
+  "version": "0.0.0-dev",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@lvce-editor/server": "^0.41.8"
+  }
+}
