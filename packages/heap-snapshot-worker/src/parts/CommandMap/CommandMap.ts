@@ -1,3 +1,4 @@
+import * as Create2 from '../Create2/Create2.ts'
 import * as CreateHeapSnapshot from '../CreateHeapSnapshot/CreateHeapSnapshot.ts'
 import * as DisposeHeapSnapshot from '../DisposeHeapSnapshot/DisposeHeapSnapshot.ts'
 import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggregatesByClassName.ts'
@@ -8,6 +9,9 @@ import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnaps
 import * as SaveState from '../SaveState/SaveState.ts'
 
 export const commandMap = {
+  'WebView.create': Create2.create,
+  'WebView.saveState': SaveState.saveState,
+
   'HeapSnapshot.create': CreateHeapSnapshot.createHeapSnapshot,
   'HeapSnapshot.dispose': DisposeHeapSnapshot.disposeHeapSnapshot,
   'HeapSnapshot.get': GetHeapSnapshot.getHeapSnapshot,
