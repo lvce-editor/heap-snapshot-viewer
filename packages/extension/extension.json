@@ -17,7 +17,7 @@
   "webViews": [
     {
       "id": "builtin.heap-snapshot-viewer",
-      "rpc": true,
+      "rpc": "builtin.heap-snapshot-viewer.heap-snapshot-worker",
       "selector": [".heapsnapshot"],
       "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'", "style-src 'self'"],
       "elements": [
