@@ -43,6 +43,12 @@ await bundleJs(
   join(root, 'dist', 'heap-snapshot-worker', 'dist', 'heapSnapshotWorkerMain.js'),
 )
 
+await replace({
+  path: join(root, 'dist', 'extension.json'),
+  occurrence: '../csv-worker/src/heapSnapshotWorkerMain.ts',
+  replacement: '../heap-snapshot-worker/dist/heapSnapshotWorkerMain.js',
+})
+
 await bundleJs(join(root, 'dist', 'src', 'heapSnapshotViewerMain.ts'), join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js'))
 
 await packageExtension({
