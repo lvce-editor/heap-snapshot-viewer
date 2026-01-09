@@ -3,7 +3,9 @@
   "name": "Heap Snapshot Viewer",
   "description": "Heap Snapshot Viewer",
   "browser": "src/heapSnapshotViewerMain.ts",
-  "activation": ["onWebView:builtin.heap-snapshot-viewer"],
+  "activation": [
+    "onWebView:builtin.heap-snapshot-viewer"
+  ],
   "languages": [],
   "rpc": [
     {
@@ -11,15 +13,23 @@
       "type": "web-worker",
       "name": "Heap Snapshot Worker",
       "url": "../heap-snapshot-worker/src/heapSnapshotWorkerMain.ts",
-      "contentSecurityPolicy": ["default-src 'none'"]
+      "contentSecurityPolicy": [
+        "default-src 'none'"
+      ]
     }
   ],
   "webViews": [
     {
       "id": "builtin.heap-snapshot-viewer",
       "rpc": "builtin.heap-snapshot-viewer.heap-snapshot-worker",
-      "selector": [".heapsnapshot"],
-      "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'", "style-src 'self'"],
+      "selector": [
+        ".heapsnapshot"
+      ],
+      "contentSecurityPolicy": [
+        "default-src 'none'",
+        "script-src 'self'",
+        "style-src 'self'"
+      ],
       "elements": [
         {
           "type": "title",
@@ -35,5 +45,6 @@
         }
       ]
     }
-  ]
+  ],
+  "repository": "https://github.com/lvce-editor/heap-snapshot-viewer"
 }
