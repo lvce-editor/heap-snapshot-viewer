@@ -13,8 +13,8 @@ export const addAccurateSizes = (
   edgeTypes: readonly string[],
   firstEdgeIndexes: Uint32Array,
 ) => {
-  const kUnvisited = 0xffffffff
-  const kHasMultipleOwners = 0xfffffffe
+  const kUnvisited = 0xff_ff_ff_ff
+  const kHasMultipleOwners = 0xff_ff_ff_fe
   const worklist: number[] = []
   const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
   const edgeCountOffset = nodeFields.indexOf(NodeFieldType.EdgeCount)
@@ -52,13 +52,13 @@ export const addAccurateSizes = (
       }
       const targetId = edges[i + edgeToNodeOffset] / nodeFieldCount
       switch (owners[targetId]) {
+        case kHasMultipleOwners:
+        case owner:
+        case targetId:
+          break
         case kUnvisited:
           owners[targetId] = owner
           worklist.push(targetId)
-          break
-        case targetId:
-        case owner:
-        case kHasMultipleOwners:
           break
         default:
           owners[targetId] = kHasMultipleOwners
@@ -70,9 +70,9 @@ export const addAccurateSizes = (
   for (let i = 0; i < nodeCount; i++) {
     const ownerId = owners[i]
     switch (ownerId) {
-      case kUnvisited:
-      case kHasMultipleOwners:
       case i:
+      case kHasMultipleOwners:
+      case kUnvisited:
         break
       default:
         const ownedNodeIndex = i * nodeFieldCount

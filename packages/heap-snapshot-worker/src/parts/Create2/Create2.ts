@@ -4,7 +4,7 @@ import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
 import * as Rpc from '../Rpc/Rpc.ts'
 
-export const create = async ({ port, savedState, webViewId, uri, id }) => {
+export const create = async ({ id, port, savedState, uri, webViewId }) => {
   const timings: any[] = []
   const startReadFile = performance.now()
 
