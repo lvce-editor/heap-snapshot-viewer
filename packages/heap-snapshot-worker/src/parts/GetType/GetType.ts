@@ -1,11 +1,11 @@
 export const getType = (value: unknown): string => {
   switch (typeof value) {
-    case 'number':
-      return 'number'
+    case 'boolean':
+      return 'boolean'
     case 'function':
       return 'function'
-    case 'string':
-      return 'string'
+    case 'number':
+      return 'number'
     case 'object':
       if (value === null) {
         return 'null'
@@ -14,8 +14,8 @@ export const getType = (value: unknown): string => {
         return 'array'
       }
       return 'object'
-    case 'boolean':
-      return 'boolean'
+    case 'string':
+      return 'string'
     default:
       return 'unknown'
   }

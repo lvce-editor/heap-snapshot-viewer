@@ -23,7 +23,7 @@ const edgeFields = ['type', 'name_or_index', 'to_node']
 const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
 
 test('exclude zero size node', () => {
-  const nodes = new Uint32Array([[3, 0, 0, 0, 2, 0, 0]].flat(1))
+  const nodes = new Uint32Array([[3, 0, 0, 0, 2, 0, 0]].flat())
   const edges = new Uint32Array([])
   const strings = ['test']
   const firstEdgeIndexes = new Uint32Array()
@@ -42,7 +42,7 @@ test('exclude zero size node', () => {
 })
 
 test('regexp node', () => {
-  const nodes = new Uint32Array([[6, 0, 0, 1, 0, 0, 0]].flat(1))
+  const nodes = new Uint32Array([[6, 0, 0, 1, 0, 0, 0]].flat())
   const edges = new Uint32Array([])
   const strings = ['test']
   const firstEdgeIndexes = new Uint32Array()
@@ -59,8 +59,8 @@ test('regexp node', () => {
     ),
   ).toEqual([
     {
-      name: 'RegExp',
       count: 1,
+      name: 'RegExp',
     },
   ])
 })

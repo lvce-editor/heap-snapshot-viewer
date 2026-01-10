@@ -19,8 +19,8 @@ export const getStatisicsInternal = (
   let sizeNative = 0
   let sizeCode = 0
   let sizeStrings = 0
-  let sizeJSArrays = 0
-  let sizeSystem = 0
+  const sizeJSArrays = 0
+  const sizeSystem = 0
   for (let i = 0; i < nodes.length; i += nodeFieldCount) {
     const selfSize = nodes[i + selfSizeOffset]
     if (selfSize === 0) {
@@ -28,26 +28,39 @@ export const getStatisicsInternal = (
     }
     const nodeType = nodes[i + nodeTypeOffset]
     const nodeName = nodes[i + nodeNameOffset]
-    if (nodeType === nodeNativeType) {
-      sizeNative += selfSize
-    } else if (nodeType === nodeCodeType) {
+    switch (nodeType) {
+    case nodeCodeType: {
       sizeCode += selfSize
-    } else if (nodeType === nodeSlicedStringType || nodeType === nodeConcatenatedStringType || nodeType === nodeStringType) {
+    
+    break;
+    }
+    case nodeConcatenatedStringType:
+    case nodeSlicedStringType: 
+    case nodeStringType: {
       sizeStrings += selfSize
-    } else {
+    
+    break;
+    } 
+    case nodeNativeType: {
+      sizeNative += selfSize
+    
+    break;
+    }
+    default: {
       const name = strings[nodeName]
       if (name === 'Array') {
         // TODO compute size of array
         // sizeJSArrays+=
       }
     }
+    }
   }
 
   return {
-    sizeNative,
     sizeCode,
-    sizeStrings,
     sizeJSArrays,
+    sizeNative,
+    sizeStrings,
     sizeSystem,
   }
 }

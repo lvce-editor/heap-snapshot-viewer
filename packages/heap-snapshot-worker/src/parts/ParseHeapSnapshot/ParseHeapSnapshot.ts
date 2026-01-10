@@ -2,7 +2,7 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.ts'
 
 export const parseHeapSnapshot = (id: number) => {
-  const { nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings } = HeapSnapshotState.get(id)
+  const { edgeFields, edges, edgeTypes, nodeFields, nodes, nodeTypes, strings } = HeapSnapshotState.get(id)
   const { firstEdgeIndexes } = ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,
     nodeFields,
@@ -12,13 +12,13 @@ export const parseHeapSnapshot = (id: number) => {
     edgeTypes,
   )
   HeapSnapshotState.add(id, {
-    nodes,
-    nodeFields,
-    nodeTypes,
-    edges,
     edgeFields,
+    edges,
     edgeTypes,
-    strings,
     firstEdgeIndexes,
+    nodeFields,
+    nodes,
+    nodeTypes,
+    strings,
   })
 }

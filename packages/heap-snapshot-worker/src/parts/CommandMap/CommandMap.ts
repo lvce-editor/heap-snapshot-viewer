@@ -9,15 +9,15 @@ import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnaps
 import * as SaveState from '../SaveState/SaveState.ts'
 
 export const commandMap = {
-  'WebView.create': Create2.create,
-  'WebView.saveState': SaveState.saveState,
-
   'HeapSnapshot.create': CreateHeapSnapshot.createHeapSnapshot,
   'HeapSnapshot.dispose': DisposeHeapSnapshot.disposeHeapSnapshot,
+
   'HeapSnapshot.get': GetHeapSnapshot.getHeapSnapshot,
   'HeapSnapshot.getAggregatesByClassName': GetAggregatesByClassName.getAggregratesByClassName,
   'HeapSnapshot.getStatistics': GetStatistics.getStatistics,
   'HeapSnapshot.parse': ParseHeapSnapshot.parseHeapSnapshot,
   'HeapSnapshot.preparse': PreparseHeapSnapshot.preparseHeapSnapshot,
   'HeapSnapshot.saveState': SaveState.saveState,
+  'WebView.create': Create2.create,
+  'WebView.saveState': SaveState.saveState,
 }

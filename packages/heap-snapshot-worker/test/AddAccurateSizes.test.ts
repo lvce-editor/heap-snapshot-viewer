@@ -28,13 +28,13 @@ test('add size to array owner', () => {
       [9, 0, 1, 1, 0, 0, 0], // root, size 1
       [3, 0, 2, 1, 1, 0, 0], // object, size 1
       [1, 0, 3, 2, 0, 0, 0], // array, size 2
-    ].flat(1),
+    ].flat(),
   )
   const nodeFieldCount = nodeFields.length
   const edges = new Uint32Array(
     [
       [2, 0, 2 * nodeFieldCount], // edge from object to array
-    ].flat(1),
+    ].flat(),
   )
   const firstEdgeIndexes = new Uint32Array([0, 0, 0])
   AddAccurateSizes.addAccurateSizes(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, firstEdgeIndexes)

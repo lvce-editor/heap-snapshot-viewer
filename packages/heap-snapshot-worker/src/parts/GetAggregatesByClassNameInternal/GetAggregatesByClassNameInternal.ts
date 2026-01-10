@@ -43,8 +43,8 @@ export const getAggregratesByClassNameInternal = (
   // TODO speed this up also
   const aggregate = Object.entries(countMap).map(([key, value]) => {
     return {
-      name: key,
       count: value,
+      name: key,
     }
   })
   const sorted = toSorted(aggregate, compareCount)

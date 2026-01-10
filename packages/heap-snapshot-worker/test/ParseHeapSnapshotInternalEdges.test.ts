@@ -6,7 +6,7 @@ test('parseHeapSnapshotInternalEdges', () => {
     [
       [0, 0, 0, 2, 0, 0, 0],
       [0, 0, 0, 2, 0, 0, 0],
-    ].flat(1),
+    ].flat(),
   )
   const edgeCountOffset = 3
   const nodeFieldCount = 7
