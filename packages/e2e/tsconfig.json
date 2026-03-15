@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "checkJs": true,
-    "module": "NodeNext",
+    "module": "nodenext",
     "types": [],
-    "moduleResolution": "nodenext",
+    "moduleResolution": "nodeNext",
     "rootDir": ".",
     "allowJs": true,
     "skipLibCheck": true,
@@ -16,5 +18,8 @@
     "strict": true,
     "noImplicitAny": false
   },
-  "include": ["src", "test"]
+  "include": [
+    "src",
+    "test"
+  ]
 }
