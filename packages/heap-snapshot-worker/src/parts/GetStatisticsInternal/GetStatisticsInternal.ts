@@ -29,30 +29,30 @@ export const getStatisicsInternal = (
     const nodeType = nodes[i + nodeTypeOffset]
     const nodeName = nodes[i + nodeNameOffset]
     switch (nodeType) {
-    case nodeCodeType: {
-      sizeCode += selfSize
-    
-    break;
-    }
-    case nodeConcatenatedStringType:
-    case nodeSlicedStringType: 
-    case nodeStringType: {
-      sizeStrings += selfSize
-    
-    break;
-    } 
-    case nodeNativeType: {
-      sizeNative += selfSize
-    
-    break;
-    }
-    default: {
-      const name = strings[nodeName]
-      if (name === 'Array') {
-        // TODO compute size of array
-        // sizeJSArrays+=
+      case nodeCodeType: {
+        sizeCode += selfSize
+
+        break
       }
-    }
+      case nodeConcatenatedStringType:
+      case nodeSlicedStringType:
+      case nodeStringType: {
+        sizeStrings += selfSize
+
+        break
+      }
+      case nodeNativeType: {
+        sizeNative += selfSize
+
+        break
+      }
+      default: {
+        const name = strings[nodeName]
+        if (name === 'Array') {
+          // TODO compute size of array
+          // sizeJSArrays+=
+        }
+      }
     }
   }
 
