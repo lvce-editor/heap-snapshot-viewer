@@ -45,8 +45,10 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   await expect(view).toBeVisible()
   const constructors = Locator('.ClassName')
   await expect(constructors).toHaveCount(2)
-  await expect(constructors.nth(0)).toHaveText('Widget')
-  await expect(constructors.nth(1)).toHaveText('Controller')
+  const firstConstructor = constructors.nth(0)
+  const secondConstructor = constructors.nth(1)
+  await expect(firstConstructor).toHaveText('Widget')
+  await expect(secondConstructor).toHaveText('Controller')
 
   const filterInput = Locator('.FilterInput')
   await filterInput.type('controller')
