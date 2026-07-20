@@ -1,3 +1,5 @@
+import type { Test } from '@lvce-editor/test-with-playwright'
+
 export const name = 'heap-snapshot-viewer'
 
 const heapSnapshot = JSON.stringify({
@@ -32,7 +34,7 @@ const heapSnapshot = JSON.stringify({
   strings: ['(GC roots)', 'Widget', 'Controller', 'widget', 'controller'],
 })
 
-export const test = async ({ FileSystem, Locator, Main, Workspace, expect }) => {
+export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/test.heapsnapshot`, heapSnapshot)
   await Workspace.setPath(tmpDir)
