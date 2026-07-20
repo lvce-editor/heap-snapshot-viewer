@@ -50,7 +50,7 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   await expect(firstConstructor).toHaveText('Widget')
   await expect(secondConstructor).toHaveText('Controller')
 
-  const filterInput = Locator('.FilterInput')
+  const filterInput = Locator('.FilterInputWrapper > .FilterInput')
   await filterInput.type('controller')
   await expect(filterInput).toHaveValue('controller')
   await new Promise((resolve) => setTimeout(resolve, 100))

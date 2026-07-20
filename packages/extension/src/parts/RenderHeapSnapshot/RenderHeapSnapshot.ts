@@ -60,7 +60,8 @@ const renderFilter = (value: string): TreeNode => {
     placeholder: 'Filter',
     value,
   })
-  return node(VirtualDomElements.Header, { className: 'Header' }, [input])
+  const inputWrapper = node(VirtualDomElements.Div, { className: 'FilterInputWrapper' }, [input])
+  return node(VirtualDomElements.Header, { className: 'Header' }, [inputWrapper])
 }
 
 const renderTiming = (timing: Readonly<HeapSnapshotViewState['timings'][number]>): TreeNode => {
