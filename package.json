@@ -3,14 +3,16 @@
   "version": "0.0.0-dev",
   "description": "",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "node scripts/build.js",
-    "dev": "node ./packages/server/node_modules/@lvce-editor/server/bin/server.js --only-extension=packages/extension --test-path=packages/e2e",
-    "e2e": "cd packages/e2e && npm run e2e",
-    "e2e:headless": "cd packages/e2e && npm run e2e:headless",
-    "postinstall": "lerna bootstrap --ci",
+    "dev": "node ./node_modules/@lvce-editor/server/bin/server.js --only-extension=packages/extension --test-path=packages/e2e",
+    "e2e": "npm run e2e --workspace=packages/e2e",
+    "e2e:headless": "npm run e2e:headless --workspace=packages/e2e",
     "lint": "eslint . && prettier --check .",
-    "test": "lerna run test",
+    "test": "npm test --workspaces --if-present",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
     "type-check": "tsc -b"
   },
@@ -18,12 +20,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@lerna/legacy-package-management": "^8.2.4",
     "@lvce-editor/eslint-config": "^16.4.0",
     "@types/node": "^25.0.9",
     "eslint": "^10.7.0",
     "jest": "^30.2.0",
-    "lerna": "^8.2.2",
     "prettier": "^3.8.0",
     "ts-jest": "^29.4.6",
     "typescript": "^6.0.0"
