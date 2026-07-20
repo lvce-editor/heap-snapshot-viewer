@@ -1,10 +1,5 @@
 {
   "files": [],
   "include": [],
-  "references": [
-    { "path": "./packages/extension" },
-    { "path": "./packages/e2e" },
-    { "path": "./packages/heap-snapshot-worker" },
-    { "path": "./packages/build" }
-  ]
+  "references": [{ "path": "./packages/extension" }, { "path": "./packages/e2e" }, { "path": "./packages/build" }]
 }

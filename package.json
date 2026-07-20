@@ -7,10 +7,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "node scripts/build.js",
-    "dev": "node ./node_modules/@lvce-editor/server/bin/server.js --only-extension=packages/extension --test-path=packages/e2e",
-    "e2e": "npm run e2e --workspace=packages/e2e",
-    "e2e:headless": "npm run e2e:headless --workspace=packages/e2e",
+    "build": "node packages/build/src/build.js",
+    "build:extension": "node packages/build/src/build-extension.js",
+    "dev": "npm run build:extension && node ./node_modules/@lvce-editor/server/bin/server.js --only-extension=packages/extension --test-path=packages/e2e",
+    "e2e": "npm run build:extension && npm run e2e --workspace=packages/e2e",
+    "e2e:headless": "npm run build:extension && npm run e2e:headless --workspace=packages/e2e",
     "lint": "eslint . && prettier --check .",
     "test": "npm test --workspaces --if-present",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",

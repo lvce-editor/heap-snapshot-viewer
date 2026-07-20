@@ -1,27 +1,31 @@
-:root {
-  --TableRowHoverBackground: rgb(224, 224, 224);
-  --FontFamily: sans-serif;
-}
-
 .HeapSnapshotView {
   contain: strict;
-  width: 200px;
-  height: 200px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 12px;
+  font-family: var(--EditorFontFamily, sans-serif);
 }
 
 .Table {
   contain: content;
-  font-family: var(--FontFamily);
+  width: 100%;
+  border-collapse: collapse;
   cursor: default;
   margin-top: 10px;
 }
 
-.TableHeader {
+.TableHeader,
+.TableHeaderRow,
+.TableBodyRow,
+.TableCell {
   contain: content;
 }
 
-.TableHeaderRow {
-  contain: content;
+.TableHeaderCell,
+.TableCell {
+  padding: 4px 8px;
 }
 
 .TableHeaderCell {
@@ -29,15 +33,7 @@
 }
 
 .TableBodyRow:where(:hover) {
-  background: var(--TableRowHoverBackground);
-}
-
-.TableBodyRow {
-  contain: content;
-}
-
-.TableCell {
-  contain: content;
+  background: var(--ListHoverBackground, rgb(224, 224, 224));
 }
 
 .CountLabel {
@@ -46,11 +42,24 @@
 }
 
 .Timings {
-  position: absolute;
   contain: content;
-  top: 0;
-  right: 0;
+  float: right;
+  margin: 0;
   list-style: none;
-  padding: 20px;
+  padding: 0;
   z-index: 1;
+}
+
+.FilterInput {
+  box-sizing: border-box;
+  min-width: 240px;
+  padding: 4px 6px;
+  color: var(--InputForeground, inherit);
+  border: 1px solid var(--InputBorder, transparent);
+  outline: none;
+  background: var(--InputBackground, transparent);
+}
+
+.FilterInput:focus {
+  border-color: var(--FocusBorder, currentColor);
 }

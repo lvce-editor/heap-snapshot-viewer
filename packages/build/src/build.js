@@ -1,10 +1,9 @@
-import { packageExtension, bundleJs, replace } from '@lvce-editor/package-extension'
+import { bundleJs, packageExtension } from '@lvce-editor/package-extension'
 import fs, { readFileSync } from 'node:fs'
 import path, { join } from 'node:path'
 import { root } from './root.js'
 
 const extension = path.join(root, 'packages', 'extension')
-const heapSnapshotWorker = path.join(root, 'packages', 'heap-snapshot-worker')
 
 fs.rmSync(join(root, 'dist'), { recursive: true, force: true })
 
@@ -28,28 +27,7 @@ fs.cpSync(join(extension, 'media'), join(root, 'dist', 'media'), {
   recursive: true,
 })
 
-fs.cpSync(join(heapSnapshotWorker, 'src'), join(root, 'dist', 'heap-snapshot-worker', 'src'), {
-  recursive: true,
-})
-
-await replace({
-  path: join(root, 'dist', 'extension.json'),
-  occurrence: 'src/heapSnapshotViewerMain.ts',
-  replacement: 'dist/heapSnapshotViewerMain.js',
-})
-
-await bundleJs(
-  join(root, 'dist', 'heap-snapshot-worker', 'src', 'heapSnapshotWorkerMain.ts'),
-  join(root, 'dist', 'heap-snapshot-worker', 'dist', 'heapSnapshotWorkerMain.js'),
-)
-
-await replace({
-  path: join(root, 'dist', 'extension.json'),
-  occurrence: '../csv-worker/src/heapSnapshotWorkerMain.ts',
-  replacement: '../heap-snapshot-worker/dist/heapSnapshotWorkerMain.js',
-})
-
-await bundleJs(join(root, 'dist', 'src', 'heapSnapshotViewerMain.ts'), join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js'))
+await bundleJs(join(extension, 'src', 'heapSnapshotViewerMain.ts'), join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js'))
 
 await packageExtension({
   highestCompression: true,

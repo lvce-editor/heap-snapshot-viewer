@@ -2,15 +2,18 @@
   "name": "builtin.heap-snapshot-viewer",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/heapSnapshotViewerMain.ts",
+  "main": "dist/heapSnapshotViewerMain.js",
   "scripts": {
-    "#test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
-    "#test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "keywords": [],
   "author": "",
   "type": "module",
-  "devDependencies": {},
+  "devDependencies": {
+    "@lvce-editor/api": "^8.54.0",
+    "@lvce-editor/virtual-dom-worker": "^11.8.0"
+  },
   "jest": {
     "injectGlobals": false,
     "extensionsToTreatAsEsm": [
