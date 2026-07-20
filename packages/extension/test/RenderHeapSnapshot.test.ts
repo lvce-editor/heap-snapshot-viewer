@@ -28,6 +28,11 @@ test('renders filter, timings, and aggregate table', () => {
     type: VirtualDomElements.Div,
   })
   expect(dom).toContainEqual({
+    childCount: 1,
+    className: 'HeapSnapshotFilterInputWrapper',
+    type: VirtualDomElements.Div,
+  })
+  expect(dom).toContainEqual({
     ariaLabel: 'Filter heap snapshot constructors',
     autocomplete: 'off',
     childCount: 0,
