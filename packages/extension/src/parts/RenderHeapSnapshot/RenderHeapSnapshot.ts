@@ -34,34 +34,34 @@ const span = (className: string, value: string): TreeNode => {
 }
 
 const renderAggregate = (aggregate: HeapSnapshotAggregate): TreeNode => {
-  const cellChildren = [span('ClassName', aggregate.name), span('CountLabel', `x ${aggregate.count}`)]
-  const cell = node(VirtualDomElements.Td, { className: 'TableCell' }, cellChildren)
-  return node(VirtualDomElements.Tr, { className: 'TableBodyRow' }, [cell])
+  const cellChildren = [span('HeapSnapshotClassName', aggregate.name), span('HeapSnapshotCountLabel', `x ${aggregate.count}`)]
+  const cell = node(VirtualDomElements.Td, { className: 'HeapSnapshotTableCell' }, cellChildren)
+  return node(VirtualDomElements.Tr, { className: 'HeapSnapshotTableBodyRow' }, [cell])
 }
 
 const renderTableHeader = (): TreeNode => {
-  const heading = node(VirtualDomElements.Th, { className: 'TableHeaderCell' }, [textNode('Constructor')])
-  const row = node(VirtualDomElements.Tr, { className: 'TableHeaderRow' }, [heading])
-  return node(VirtualDomElements.THead, { className: 'TableHeader' }, [row])
+  const heading = node(VirtualDomElements.Th, { className: 'HeapSnapshotTableHeaderCell' }, [textNode('Constructor')])
+  const row = node(VirtualDomElements.Tr, { className: 'HeapSnapshotTableHeaderRow' }, [heading])
+  return node(VirtualDomElements.THead, { className: 'HeapSnapshotTableHeader' }, [row])
 }
 
 const renderTable = (aggregates: readonly HeapSnapshotAggregate[]): TreeNode => {
-  const body = node(VirtualDomElements.TBody, { className: 'TableBody' }, aggregates.map(renderAggregate))
-  return node(VirtualDomElements.Table, { className: 'Table' }, [renderTableHeader(), body])
+  const body = node(VirtualDomElements.TBody, { className: 'HeapSnapshotTableBody' }, aggregates.map(renderAggregate))
+  return node(VirtualDomElements.Table, { className: 'HeapSnapshotTable' }, [renderTableHeader(), body])
 }
 
 const renderFilter = (value: string): TreeNode => {
   const input = node(VirtualDomElements.Input, {
     ariaLabel: 'Filter heap snapshot constructors',
     autocomplete: 'off',
-    className: 'FilterInput',
+    className: 'HeapSnapshotFilterInput',
     name: 'filter',
     onInput: 'handleInput',
     placeholder: 'Filter',
     value,
   })
-  const inputWrapper = node(VirtualDomElements.Div, { className: 'FilterInputWrapper' }, [input])
-  return node(VirtualDomElements.Header, { className: 'Header' }, [inputWrapper])
+  const inputWrapper = node(VirtualDomElements.Div, { className: 'HeapSnapshotFilterInputWrapper' }, [input])
+  return node(VirtualDomElements.Header, { className: 'HeapSnapshotHeader' }, [inputWrapper])
 }
 
 const renderTiming = (timing: Readonly<HeapSnapshotViewState['timings'][number]>): TreeNode => {
@@ -70,7 +70,7 @@ const renderTiming = (timing: Readonly<HeapSnapshotViewState['timings'][number]>
 }
 
 export const render = (state: Readonly<HeapSnapshotViewState>): readonly VirtualDomNode[] => {
-  const timings = node(VirtualDomElements.Ul, { className: 'Timings' }, state.timings.map(renderTiming))
+  const timings = node(VirtualDomElements.Ul, { className: 'HeapSnapshotTimings' }, state.timings.map(renderTiming))
   const children = [renderFilter(state.filterValue), timings, renderTable(state.aggregates)]
   const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView' }, children)
   return flatten(root)

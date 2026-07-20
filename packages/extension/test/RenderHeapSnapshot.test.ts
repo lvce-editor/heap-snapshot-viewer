@@ -20,6 +20,7 @@ const state = {
 
 test('renders filter, timings, and aggregate table', () => {
   const dom = render(state)
+  const classNames = dom.flatMap((node) => (typeof node.className === 'string' ? [node.className] : []))
 
   expect(dom[0]).toEqual({
     childCount: 3,
@@ -28,14 +29,14 @@ test('renders filter, timings, and aggregate table', () => {
   })
   expect(dom).toContainEqual({
     childCount: 1,
-    className: 'FilterInputWrapper',
+    className: 'HeapSnapshotFilterInputWrapper',
     type: VirtualDomElements.Div,
   })
   expect(dom).toContainEqual({
     ariaLabel: 'Filter heap snapshot constructors',
     autocomplete: 'off',
     childCount: 0,
-    className: 'FilterInput',
+    className: 'HeapSnapshotFilterInput',
     name: 'filter',
     onInput: 'handleInput',
     placeholder: 'Filter',
@@ -45,4 +46,6 @@ test('renders filter, timings, and aggregate table', () => {
   expect(dom.some((node) => node.text === 'parse: 1.25')).toBe(true)
   expect(dom.some((node) => node.text === 'Widget')).toBe(true)
   expect(dom.some((node) => node.text === 'x 2')).toBe(true)
+  expect(classNames.every((className) => className.startsWith('HeapSnapshot'))).toBe(true)
+  expect(classNames).toContain('HeapSnapshotTable')
 })

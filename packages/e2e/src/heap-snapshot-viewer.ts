@@ -43,19 +43,22 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
 
   const view = Locator('.HeapSnapshotView')
   await expect(view).toBeVisible()
-  const constructors = Locator('.ClassName')
+  const table = Locator('.HeapSnapshotTable')
+  await expect(table).toBeVisible()
+  await expect(table).toHaveCSS('table-layout', 'auto')
+  const constructors = Locator('.HeapSnapshotClassName')
   await expect(constructors).toHaveCount(2)
   const firstConstructor = constructors.nth(0)
   const secondConstructor = constructors.nth(1)
   await expect(firstConstructor).toHaveText('Widget')
   await expect(secondConstructor).toHaveText('Controller')
 
-  const filterInput = Locator('.FilterInputWrapper > .FilterInput')
+  const filterInput = Locator('.HeapSnapshotFilterInputWrapper > .HeapSnapshotFilterInput')
   await filterInput.type('controller')
   await expect(filterInput).toHaveValue('controller')
   await new Promise((resolve) => setTimeout(resolve, 100))
 
-  const filteredConstructors = Locator('.ClassName')
+  const filteredConstructors = Locator('.HeapSnapshotClassName')
   await expect(filteredConstructors).toHaveCount(1)
   await expect(filteredConstructors).toHaveText('Controller')
 }
