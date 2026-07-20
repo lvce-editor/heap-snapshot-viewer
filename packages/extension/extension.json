@@ -2,39 +2,21 @@
   "id": "builtin.heap-snapshot-viewer",
   "name": "Heap Snapshot Viewer",
   "description": "Heap Snapshot Viewer",
-  "browser": "src/heapSnapshotViewerMain.ts",
-  "activation": ["onWebView:builtin.heap-snapshot-viewer"],
+  "repository": "https://github.com/lvce-editor/heap-snapshot-viewer",
+  "browser": "dist/heapSnapshotViewerMain.js",
+  "isolated": true,
+  "workerName": "Heap Snapshot Viewer Extension Worker",
+  "activation": ["onView:builtin.heap-snapshot-viewer"],
   "languages": [],
-  "rpc": [
-    {
-      "id": "builtin.heap-snapshot-viewer.heap-snapshot-worker",
-      "type": "web-worker",
-      "name": "Heap Snapshot Worker",
-      "url": "../heap-snapshot-worker/src/heapSnapshotWorkerMain.ts",
-      "contentSecurityPolicy": ["default-src 'none'"]
-    }
-  ],
-  "webViews": [
+  "views": [
     {
       "id": "builtin.heap-snapshot-viewer",
-      "rpc": "builtin.heap-snapshot-viewer.heap-snapshot-worker",
+      "title": "Heap Snapshot Viewer",
+      "kind": "virtualDom",
+      "type": "preview",
+      "css": "media/index.css",
       "selector": [".heapsnapshot"],
-      "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'", "style-src 'self'"],
-      "elements": [
-        {
-          "type": "title",
-          "value": "Heapsnapshot Viewer"
-        },
-        {
-          "type": "script",
-          "path": "media/index.js"
-        },
-        {
-          "type": "css",
-          "path": "media/index.css"
-        }
-      ]
+      "showSideBarHeader": false
     }
-  ],
-  "repository": "https://github.com/lvce-editor/heap-snapshot-viewer"
+  ]
 }

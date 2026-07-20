@@ -2,7 +2,7 @@ This project incorporates components from the projects listed below, that may ha
 differing from this project:
 
 
-1) License Notice for packages/heap-snapshot-worker/src/parts/AddAccurateSizes/AddAccurateSizes.ts (based on https://github.com/ChromeDevTools/devtools-frontend/blob/7ca2fec01b492e9b23b21738394200397a74c4aa/front_end/entrypoints/heap_snapshot_worker/HeapSnapshot.ts)
+1) License Notice for packages/extension/src/parts/AddAccurateSizes/AddAccurateSizes.ts (based on https://github.com/ChromeDevTools/devtools-frontend/blob/7ca2fec01b492e9b23b21738394200397a74c4aa/front_end/entrypoints/heap_snapshot_worker/HeapSnapshot.ts)
 ---------------------------------------
 
 // Copyright 2014 The Chromium Authors. All rights reserved.
