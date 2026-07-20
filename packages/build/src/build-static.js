@@ -17,6 +17,7 @@ const { exportStatic } = await import(sharedProcessUri)
 const { commitHash } = await exportStatic({
   extensionPath: 'packages/extension',
   root,
+  testPath: 'packages/e2e',
 })
 
 await cp(path.join(root, 'dist2'), path.join(root, 'dist', commitHash, 'extensions', 'builtin.heap-snapshot-viewer'), {
