@@ -11,7 +11,7 @@ await cp(path.join(root, 'dist'), path.join(root, 'dist2'), {
   force: true,
 })
 
-const sharedProcessPath = join(root, 'packages', 'server', 'node_modules', '@lvce-editor', 'shared-process', 'index.js')
+const sharedProcessPath = join(root, 'node_modules', '@lvce-editor', 'shared-process', 'index.js')
 const sharedProcessUri = pathToFileURL(sharedProcessPath).toString()
 const { exportStatic } = await import(sharedProcessUri)
 

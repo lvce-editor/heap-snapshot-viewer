@@ -39,6 +39,6 @@ export default [
     },
   },
   {
-    ignores: ['**/package.json', '**/tsconfig.json', '**/lerna.json', '**/package-lock.json', '**/extension.json'],
+    ignores: ['**/package.json', '**/tsconfig.json', '**/package-lock.json', '**/extension.json'],
   },
 ]
