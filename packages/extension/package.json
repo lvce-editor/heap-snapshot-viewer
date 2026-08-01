@@ -11,7 +11,7 @@
   "author": "",
   "type": "module",
   "devDependencies": {
-    "@lvce-editor/api": "^8.59.0",
+    "@lvce-editor/api": "^8.75.0",
     "@lvce-editor/virtual-dom-worker": "^11.8.1"
   },
   "jest": {
