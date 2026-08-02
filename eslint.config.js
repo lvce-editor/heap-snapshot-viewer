@@ -1,9 +1,9 @@
+import { defineConfig } from 'eslint/config'
 import * as config from '@lvce-editor/eslint-config'
-import * as actions from '@lvce-editor/eslint-plugin-github-actions'
 
-export default [
+export default defineConfig([
   ...config.default,
-  ...actions.default,
+  ...config.recommendedActions,
   {
     files: ['.github/workflows/*.yml', '.github/workflows/*.yaml'],
     rules: {
@@ -41,4 +41,4 @@ export default [
   {
     ignores: ['**/package.json', '**/tsconfig.json', '**/package-lock.json', '**/extension.json'],
   },
-]
+])
