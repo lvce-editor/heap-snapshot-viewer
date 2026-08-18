@@ -8,4 +8,10 @@ const outDir = join(extension, 'dist')
 
 fs.rmSync(outDir, { recursive: true, force: true })
 
-await bundleJs(join(extension, 'src', 'heapSnapshotViewerMain.ts'), join(outDir, 'heapSnapshotViewerMain.js'))
+await Promise.all([
+  bundleJs(
+    join(root, 'packages', 'heap-snapshot-parser-worker', 'src', 'heapSnapshotParserWorkerMain.ts'),
+    join(outDir, 'heapSnapshotParserWorkerMain.js'),
+  ),
+  bundleJs(join(extension, 'src', 'heapSnapshotViewerMain.ts'), join(outDir, 'heapSnapshotViewerMain.js')),
+])

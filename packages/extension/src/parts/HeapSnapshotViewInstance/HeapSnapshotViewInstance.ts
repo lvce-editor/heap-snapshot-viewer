@@ -1,40 +1,16 @@
 import type { VirtualDomNode } from '@lvce-editor/virtual-dom-worker'
 import { getPreference, readFile, type ViewContext, type ViewEvent, type VirtualDomViewInstance } from '@lvce-editor/api'
-import * as CreateHeapSnapshot from '../CreateHeapSnapshot/CreateHeapSnapshot.ts'
-import * as DisposeHeapSnapshot from '../DisposeHeapSnapshot/DisposeHeapSnapshot.ts'
+import type {
+  HeapSnapshotAggregate,
+  HeapSnapshotMemoryType,
+  HeapSnapshotSummary,
+  HeapSnapshotTiming,
+  ParsedHeapSnapshot,
+} from '../HeapSnapshot/HeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
-import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggregatesByClassName.ts'
-import * as GetSnapshotSummary from '../GetSnapshotSummary/GetSnapshotSummary.ts'
-import * as GetStatistics from '../GetStatistics/GetStatistics.ts'
+import { parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
 import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
-import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
 import { render, renderError } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
-
-export interface HeapSnapshotAggregate {
-  readonly count: number
-  readonly name: string
-  readonly retainedSize: number
-  readonly shallowSize: number
-  readonly type: string
-}
-
-export interface HeapSnapshotMemoryType {
-  readonly name: string
-  readonly size: number
-}
-
-export interface HeapSnapshotSummary {
-  readonly edgeCount: number
-  readonly nodeCount: number
-  readonly snapshotSize: number
-  readonly totalShallowSize: number
-}
-
-export interface HeapSnapshotTiming {
-  readonly name: string
-  readonly time: number
-}
 
 export interface HeapSnapshotViewState {
   readonly aggregates: readonly HeapSnapshotAggregate[]
@@ -63,12 +39,14 @@ export interface HeapSnapshotViewInstance extends VirtualDomViewInstance {
 export interface HeapSnapshotViewDependencies {
   readonly getPreference: (key: string) => Promise<unknown>
   readonly now: () => number
+  readonly parseHeapSnapshot: (content: string) => Promise<ParsedHeapSnapshot>
   readonly readFile: (uri: string) => Promise<string>
 }
 
 const defaultDependencies: HeapSnapshotViewDependencies = {
   getPreference,
   now: (): number => performance.now(),
+  parseHeapSnapshot,
   readFile,
 }
 
@@ -108,15 +86,13 @@ const measure = async <T>(
   return result
 }
 
-const createErrorInstance = (id: number, uri: string, error: unknown): HeapSnapshotViewInstance => {
+const createErrorInstance = (uri: string, error: unknown): HeapSnapshotViewInstance => {
   const message =
     error instanceof HeapSnapshotValidationError
       ? error.message
       : 'The heap snapshot could not be processed because its data is inconsistent.'
   return {
-    dispose(): void {
-      DisposeHeapSnapshot.disposeHeapSnapshot(id)
-    },
+    dispose(): void {},
     render(): readonly VirtualDomNode[] {
       return renderError(message)
     },
@@ -132,40 +108,24 @@ export const createInstanceWithDependencies = async (
 ): Promise<HeapSnapshotViewInstance> => {
   const savedState = getSavedState(context)
   const uri = getUri(context, savedState)
-  const id = context?.uid ?? 0
   const timings: HeapSnapshotTiming[] = []
   const showTimings = (await dependencies.getPreference(ShowTimingsSetting)) === true
 
   try {
     const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
-    await measure('create', () => CreateHeapSnapshot.createHeapSnapshot(id, content), dependencies.now, timings)
-    await measure('pre-parse', () => PreparseHeapSnapshot.preparseHeapSnapshot(id), dependencies.now, timings)
-    const statistics = await measure('statistics', () => GetStatistics.getStatistics(id), dependencies.now, timings)
-    const snapshotSummary = GetSnapshotSummary.getSnapshotSummary(id)
-    await measure('parse', () => ParseHeapSnapshot.parseHeapSnapshot(id), dependencies.now, timings)
-    const aggregates = await measure(
-      'aggregates',
-      () => GetAggregatesByClassName.getAggregratesByClassName(id),
-      dependencies.now,
-      timings,
-    )
+    const parsed = await dependencies.parseHeapSnapshot(content)
     let state: HeapSnapshotViewState = {
-      aggregates,
+      aggregates: parsed.aggregates,
       expandedNames: [],
       filterValue: getFilterValue(savedState),
-      memoryByType: statistics.memoryByType,
+      memoryByType: parsed.memoryByType,
       showTimings,
-      summary: {
-        ...snapshotSummary,
-        totalShallowSize: statistics.totalShallowSize,
-      },
-      timings,
+      summary: parsed.summary,
+      timings: [...timings, ...parsed.timings],
     }
 
     return {
-      dispose(): void {
-        DisposeHeapSnapshot.disposeHeapSnapshot(id)
-      },
+      dispose(): void {},
       handleEvent(event: Readonly<ViewEvent>): void {
         if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
           const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
@@ -201,8 +161,7 @@ export const createInstanceWithDependencies = async (
       },
     }
   } catch (error) {
-    DisposeHeapSnapshot.disposeHeapSnapshot(id)
-    return createErrorInstance(id, uri, error)
+    return createErrorInstance(uri, error)
   }
 }
 
