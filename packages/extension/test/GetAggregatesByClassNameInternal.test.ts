@@ -19,48 +19,69 @@ const nodeTypes = [
   'bigint',
   'object shape',
 ]
-const edgeFields = ['type', 'name_or_index', 'to_node']
-const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
-
 test('exclude zero size node', () => {
   const nodes = new Uint32Array([[3, 0, 0, 0, 2, 0, 0]].flat())
-  const edges = new Uint32Array([])
   const strings = ['test']
-  const firstEdgeIndexes = new Uint32Array()
   expect(
     GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(
       nodes,
       nodeFields,
       nodeTypes,
-      edges,
-      edgeFields,
-      edgeTypes,
       strings,
-      firstEdgeIndexes,
+      new Float64Array([0]),
+      new Uint32Array([0]),
     ),
   ).toEqual([])
 })
 
 test('regexp node', () => {
   const nodes = new Uint32Array([[6, 0, 0, 1, 0, 0, 0]].flat())
-  const edges = new Uint32Array([])
   const strings = ['test']
-  const firstEdgeIndexes = new Uint32Array()
   expect(
     GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(
       nodes,
       nodeFields,
       nodeTypes,
-      edges,
-      edgeFields,
-      edgeTypes,
       strings,
-      firstEdgeIndexes,
+      new Float64Array([1]),
+      new Uint32Array([0]),
     ),
   ).toEqual([
     {
       count: 1,
       name: 'RegExp',
+      retainedSize: 1,
+      shallowSize: 1,
+      type: 'regexp',
+    },
+  ])
+})
+
+test('does not double count retained size for nested instances of the same class', () => {
+  const nodes = new Uint32Array(
+    [
+      [9, 0, 0, 0, 1, 0, 0],
+      [3, 1, 0, 10, 1, 0, 0],
+      [3, 1, 0, 5, 0, 0, 0],
+    ].flat(),
+  )
+  const strings = ['(GC roots)', 'Widget']
+  expect(
+    GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(
+      nodes,
+      nodeFields,
+      nodeTypes,
+      strings,
+      new Float64Array([15, 15, 5]),
+      new Uint32Array([0, 0, 1]),
+    ),
+  ).toEqual([
+    {
+      count: 2,
+      name: 'Widget',
+      retainedSize: 15,
+      shallowSize: 15,
+      type: 'object',
     },
   ])
 })

@@ -4,62 +4,371 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding: 12px;
+  color: var(--EditorForeground, #cccccc);
+  background: var(--EditorBackground, #1f1f1f);
   font-family: var(--EditorFontFamily, sans-serif);
+  font-size: 13px;
+}
+
+.HeapSnapshotHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  min-height: 60px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.25));
+  background: var(--EditorBackground, #1f1f1f);
+}
+
+.HeapSnapshotFilterInputWrapper {
+  position: relative;
+  flex: 1 1 360px;
+  max-width: 560px;
+}
+
+.HeapSnapshotFilterInput {
+  width: 100%;
+  min-width: 180px;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  color: var(--InputForeground, inherit);
+  border: 1px solid var(--InputBorder, transparent);
+  border-radius: 3px;
+  outline: none;
+  background: var(--InputBackground, rgba(128, 128, 128, 0.12));
+  font: inherit;
+}
+
+.HeapSnapshotFilterInput::placeholder {
+  color: var(--InputPlaceholderForeground, rgba(204, 204, 204, 0.55));
+}
+
+.HeapSnapshotFilterInput:focus {
+  border-color: var(--FocusBorder, #007fd4);
+}
+
+.HeapSnapshotMetadata {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 24px;
+}
+
+.HeapSnapshotMetadataItem {
+  display: flex;
+  min-width: 70px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.HeapSnapshotMetadataValue {
+  color: var(--EditorForeground, #cccccc);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.HeapSnapshotMetadataLabel {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.HeapSnapshotMemorySection,
+.HeapSnapshotTimingsSection {
+  margin: 16px 20px 0;
+  padding: 16px;
+  border: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.25));
+  border-radius: 5px;
+  background: var(--SideBarBackground, rgba(128, 128, 128, 0.035));
+}
+
+.HeapSnapshotSectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.HeapSnapshotSectionTitle {
+  margin: 0;
+  color: var(--EditorForeground, #cccccc);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.HeapSnapshotSectionTotal {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.HeapSnapshotMemoryList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px 24px;
+}
+
+.HeapSnapshotMemoryType {
+  min-width: 0;
+}
+
+.HeapSnapshotMemoryTypeHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.HeapSnapshotMemoryTypeName {
+  overflow: hidden;
+  color: var(--EditorForeground, #cccccc);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.HeapSnapshotMemoryTypeSize {
+  flex: 0 0 auto;
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.HeapSnapshotMemoryBar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ProgressBarBackground, rgba(128, 128, 128, 0.2));
+}
+
+.HeapSnapshotMemoryBarValue {
+  width: var(--HeapSnapshotMemoryPercent);
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background: var(--ProgressBarForeground, var(--FocusBorder, #007fd4));
+}
+
+.HeapSnapshotTimings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 20px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.HeapSnapshotTiming {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.HeapSnapshotTimingName {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+}
+
+.HeapSnapshotTimingValue {
+  font-variant-numeric: tabular-nums;
 }
 
 .HeapSnapshotTable {
-  contain: content;
-  width: 100%;
-  border-collapse: collapse;
+  width: calc(100% - 40px);
+  table-layout: fixed;
+  border-spacing: 0;
+  border-collapse: separate;
+  margin: 16px 20px 24px;
   cursor: default;
-  margin-top: 10px;
 }
 
 .HeapSnapshotTableHeader,
 .HeapSnapshotTableHeaderRow,
 .HeapSnapshotTableBodyRow,
-.HeapSnapshotTableCell {
+.HeapSnapshotTableDetailRow,
+.HeapSnapshotTableCell,
+.HeapSnapshotTableDetailCell {
   contain: content;
 }
 
 .HeapSnapshotTableHeaderCell,
 .HeapSnapshotTableCell {
-  padding: 4px 8px;
+  box-sizing: border-box;
+  padding: 9px 12px;
 }
 
 .HeapSnapshotTableHeaderCell {
+  overflow: hidden;
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  border-bottom: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.32));
   text-align: left;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.055em;
 }
 
-.HeapSnapshotTableBodyRow:where(:hover) {
-  background: var(--ListHoverBackground, rgb(224, 224, 224));
+.HeapSnapshotTableHeaderCell:first-child {
+  width: 60%;
+}
+
+.HeapSnapshotTableHeaderCell:nth-child(2),
+.HeapSnapshotTableHeaderCell:nth-child(3) {
+  width: 20%;
+}
+
+.HeapSnapshotTableBodyRow {
+  height: 36px;
+}
+
+.HeapSnapshotTableBodyRow:hover,
+.HeapSnapshotTableBodyRowExpanded {
+  background: var(--ListHoverBackground, rgba(128, 128, 128, 0.12));
+}
+
+.HeapSnapshotTableCell {
+  overflow: hidden;
+  border-bottom: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.16));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.HeapSnapshotConstructorCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.HeapSnapshotDisclosure {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--IconForeground, currentColor);
+  border: 0;
+  border-radius: 3px;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.HeapSnapshotDisclosure:hover {
+  background: var(--ToolbarHoverBackground, rgba(128, 128, 128, 0.18));
+}
+
+.HeapSnapshotDisclosure:focus-visible {
+  outline: 1px solid var(--FocusBorder, #007fd4);
+  outline-offset: 1px;
+}
+
+.HeapSnapshotChevron {
+  display: inline-block;
+  transform: rotate(0deg);
+  transition: transform 100ms ease-out;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.HeapSnapshotChevronExpanded {
+  transform: rotate(90deg);
+}
+
+.HeapSnapshotClassName {
+  overflow: hidden;
+  color: var(--TextLinkForeground, var(--EditorForeground, #cccccc));
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .HeapSnapshotCountLabel {
-  font-size: 15px;
-  margin-left: 10px;
+  flex: 0 0 auto;
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.HeapSnapshotTimings {
-  contain: content;
-  float: right;
-  margin: 0;
-  list-style: none;
+.HeapSnapshotNumericCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.HeapSnapshotTableDetailCell {
   padding: 0;
-  z-index: 1;
+  border-bottom: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.16));
 }
 
-.HeapSnapshotFilterInput {
-  box-sizing: border-box;
-  min-width: 240px;
-  padding: 4px 6px;
-  color: var(--InputForeground, inherit);
-  border: 1px solid var(--InputBorder, transparent);
-  outline: none;
-  background: var(--InputBackground, transparent);
+.HeapSnapshotAggregateDetails {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 16px;
+  padding: 12px 12px 14px 40px;
+  background: var(--EditorWidgetBackground, rgba(128, 128, 128, 0.055));
 }
 
-.HeapSnapshotFilterInput:focus {
-  border-color: var(--FocusBorder, currentColor);
+.HeapSnapshotAggregateDetail {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.HeapSnapshotAggregateDetailLabel {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-size: 11px;
+}
+
+.HeapSnapshotAggregateDetailValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .HeapSnapshotHeader {
+    position: static;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .HeapSnapshotFilterInputWrapper {
+    flex-basis: auto;
+    max-width: none;
+  }
+
+  .HeapSnapshotMetadata {
+    justify-content: space-between;
+  }
+
+  .HeapSnapshotMetadataItem {
+    min-width: 0;
+    align-items: flex-start;
+  }
+
+  .HeapSnapshotAggregateDetails {
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
+  }
+
+  .HeapSnapshotTableHeaderCell:first-child {
+    width: 50%;
+  }
+
+  .HeapSnapshotTableHeaderCell:nth-child(2),
+  .HeapSnapshotTableHeaderCell:nth-child(3) {
+    width: 25%;
+  }
 }
