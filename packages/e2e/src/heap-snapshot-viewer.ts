@@ -34,7 +34,7 @@ const heapSnapshot = JSON.stringify({
   strings: ['(GC roots)', 'Widget', 'Controller', 'widget', 'controller'],
 })
 
-export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace }) => {
+export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/test.heapsnapshot`, heapSnapshot)
   await Workspace.setPath(tmpDir)
@@ -74,11 +74,13 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
 
   const disclosure = Locator('.HeapSnapshotDisclosure').nth(0)
   await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
-  await disclosure.dispatchEvent('click', { bubbles: true } as unknown as string)
-  await expect(disclosure).toHaveAttribute('aria-expanded', 'true')
+  // eslint-disable-next-line e2e/no-direct-click -- This extension-local disclosure does not have a shared page object.
+  await disclosure.click()
+  await Command.execute('Timeout.sleep', 200)
   const details = Locator('.HeapSnapshotAggregateDetails')
   await expect(details).toBeVisible()
-  const expandedChevron = Locator('.HeapSnapshotChevronExpanded')
+  await expect(disclosure).toHaveAttribute('aria-expanded', 'true')
+  const expandedChevron = Locator('.HeapSnapshotDisclosureExpanded')
   await expect(expandedChevron).toHaveCount(1)
 
   const filterInput = Locator('.HeapSnapshotFilterInputWrapper > .HeapSnapshotFilterInput')

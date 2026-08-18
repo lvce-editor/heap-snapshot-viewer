@@ -45,9 +45,9 @@ test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () =
     type: VirtualDomElements.Div,
   })
   expect(dom).toContainEqual({
-    ariaExpanded: false,
+    ariaExpanded: 'false',
     ariaLabel: 'Expand Widget',
-    childCount: 1,
+    childCount: 0,
     className: 'HeapSnapshotDisclosure',
     name: 'toggle-aggregate:Widget',
     onClick: 'handleClick',
@@ -88,17 +88,21 @@ test('shows processing timings only when enabled', () => {
   expect(dom.some((node) => node.text === '1.25 ms')).toBe(true)
 })
 
-test('renders expanded aggregate details and an expanded chevron', () => {
+test('renders expanded aggregate details and an expanded disclosure', () => {
   const dom = render({
     ...state,
     expandedNames: ['Widget'],
   })
 
   expect(dom).toContainEqual({
-    ariaHidden: true,
-    childCount: 1,
-    className: 'HeapSnapshotChevron HeapSnapshotChevronExpanded',
-    type: VirtualDomElements.Span,
+    ariaExpanded: 'true',
+    ariaLabel: 'Collapse Widget',
+    childCount: 0,
+    className: 'HeapSnapshotDisclosure HeapSnapshotDisclosureExpanded',
+    name: 'toggle-aggregate:Widget',
+    onClick: 'handleClick',
+    title: 'Collapse Widget',
+    type: VirtualDomElements.Button,
   })
   expect(dom.some((node) => node.text === 'Average shallow')).toBe(true)
   expect(dom.some((node) => node.text === '32 B')).toBe(true)

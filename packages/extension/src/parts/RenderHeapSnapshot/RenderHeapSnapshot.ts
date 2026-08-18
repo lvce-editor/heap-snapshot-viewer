@@ -89,19 +89,15 @@ const renderAggregate = (
   isExpanded: boolean,
   summary: HeapSnapshotSummary,
 ): readonly TreeNode[] => {
-  const chevronClassName = isExpanded ? 'HeapSnapshotChevron HeapSnapshotChevronExpanded' : 'HeapSnapshotChevron'
-  const disclosure = node(
-    VirtualDomElements.Button,
-    {
-      ariaExpanded: isExpanded,
-      ariaLabel: `${isExpanded ? 'Collapse' : 'Expand'} ${aggregate.name}`,
-      className: 'HeapSnapshotDisclosure',
-      name: `${ToggleAggregatePrefix}${aggregate.name}`,
-      onClick: 'handleClick',
-      title: `${isExpanded ? 'Collapse' : 'Expand'} ${aggregate.name}`,
-    },
-    [span(chevronClassName, '›', { ariaHidden: true })],
-  )
+  const disclosureClassName = isExpanded ? 'HeapSnapshotDisclosure HeapSnapshotDisclosureExpanded' : 'HeapSnapshotDisclosure'
+  const disclosure = node(VirtualDomElements.Button, {
+    ariaExpanded: isExpanded ? 'true' : 'false',
+    ariaLabel: `${isExpanded ? 'Collapse' : 'Expand'} ${aggregate.name}`,
+    className: disclosureClassName,
+    name: `${ToggleAggregatePrefix}${aggregate.name}`,
+    onClick: 'handleClick',
+    title: `${isExpanded ? 'Collapse' : 'Expand'} ${aggregate.name}`,
+  })
   const constructorCell = node(VirtualDomElements.Td, { className: 'HeapSnapshotTableCell HeapSnapshotConstructorCell' }, [
     disclosure,
     span('HeapSnapshotClassName', aggregate.name),
