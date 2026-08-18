@@ -6,9 +6,10 @@ import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggregatesByClassName.ts'
 import * as GetSnapshotSummary from '../GetSnapshotSummary/GetSnapshotSummary.ts'
 import * as GetStatistics from '../GetStatistics/GetStatistics.ts'
+import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
-import { render } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
+import { render, renderError } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
 export interface HeapSnapshotAggregate {
   readonly count: number
@@ -107,6 +108,24 @@ const measure = async <T>(
   return result
 }
 
+const createErrorInstance = (id: number, uri: string, error: unknown): HeapSnapshotViewInstance => {
+  const message =
+    error instanceof HeapSnapshotValidationError
+      ? error.message
+      : 'The heap snapshot could not be processed because its data is inconsistent.'
+  return {
+    dispose(): void {
+      DisposeHeapSnapshot.disposeHeapSnapshot(id)
+    },
+    render(): readonly VirtualDomNode[] {
+      return renderError(message)
+    },
+    saveState(): HeapSnapshotSavedState {
+      return { uri }
+    },
+  }
+}
+
 export const createInstanceWithDependencies = async (
   context: HeapSnapshotViewContext | undefined,
   dependencies: HeapSnapshotViewDependencies,
@@ -116,9 +135,9 @@ export const createInstanceWithDependencies = async (
   const id = context?.uid ?? 0
   const timings: HeapSnapshotTiming[] = []
   const showTimings = (await dependencies.getPreference(ShowTimingsSetting)) === true
-  const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
 
   try {
+    const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
     await measure('create', () => CreateHeapSnapshot.createHeapSnapshot(id, content), dependencies.now, timings)
     await measure('pre-parse', () => PreparseHeapSnapshot.preparseHeapSnapshot(id), dependencies.now, timings)
     const statistics = await measure('statistics', () => GetStatistics.getStatistics(id), dependencies.now, timings)
@@ -183,7 +202,7 @@ export const createInstanceWithDependencies = async (
     }
   } catch (error) {
     DisposeHeapSnapshot.disposeHeapSnapshot(id)
-    throw error
+    return createErrorInstance(id, uri, error)
   }
 }
 

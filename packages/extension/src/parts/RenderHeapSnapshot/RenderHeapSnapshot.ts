@@ -220,3 +220,13 @@ export const render = (state: Readonly<HeapSnapshotViewState>): readonly Virtual
   const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView' }, children)
   return flatten(root)
 }
+
+export const renderError = (message: string): readonly VirtualDomNode[] => {
+  const title = node(VirtualDomElements.H2, { className: 'HeapSnapshotErrorTitle' }, [textNode('Unable to open heap snapshot')])
+  const detail = node(VirtualDomElements.P, { className: 'HeapSnapshotErrorMessage' }, [textNode(message)])
+  const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView HeapSnapshotViewError', role: 'alert' }, [
+    title,
+    detail,
+  ])
+  return flatten(root)
+}
