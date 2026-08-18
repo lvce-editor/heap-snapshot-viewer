@@ -1,9 +1,11 @@
 import type { VirtualDomNode } from '@lvce-editor/virtual-dom-worker'
-import { readFile, type ViewContext, type ViewEvent, type VirtualDomViewInstance } from '@lvce-editor/api'
+import { getPreference, readFile, type ViewContext, type ViewEvent, type VirtualDomViewInstance } from '@lvce-editor/api'
 import * as CreateHeapSnapshot from '../CreateHeapSnapshot/CreateHeapSnapshot.ts'
 import * as DisposeHeapSnapshot from '../DisposeHeapSnapshot/DisposeHeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggregatesByClassName.ts'
+import * as GetSnapshotSummary from '../GetSnapshotSummary/GetSnapshotSummary.ts'
+import * as GetStatistics from '../GetStatistics/GetStatistics.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
 import { render } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
@@ -11,6 +13,21 @@ import { render } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 export interface HeapSnapshotAggregate {
   readonly count: number
   readonly name: string
+  readonly retainedSize: number
+  readonly shallowSize: number
+  readonly type: string
+}
+
+export interface HeapSnapshotMemoryType {
+  readonly name: string
+  readonly size: number
+}
+
+export interface HeapSnapshotSummary {
+  readonly edgeCount: number
+  readonly nodeCount: number
+  readonly snapshotSize: number
+  readonly totalShallowSize: number
 }
 
 export interface HeapSnapshotTiming {
@@ -20,7 +37,11 @@ export interface HeapSnapshotTiming {
 
 export interface HeapSnapshotViewState {
   readonly aggregates: readonly HeapSnapshotAggregate[]
+  readonly expandedNames: readonly string[]
   readonly filterValue: string
+  readonly memoryByType: readonly HeapSnapshotMemoryType[]
+  readonly showTimings: boolean
+  readonly summary: HeapSnapshotSummary
   readonly timings: readonly HeapSnapshotTiming[]
 }
 
@@ -39,14 +60,19 @@ export interface HeapSnapshotViewInstance extends VirtualDomViewInstance {
 }
 
 export interface HeapSnapshotViewDependencies {
+  readonly getPreference: (key: string) => Promise<unknown>
   readonly now: () => number
   readonly readFile: (uri: string) => Promise<string>
 }
 
 const defaultDependencies: HeapSnapshotViewDependencies = {
+  getPreference,
   now: (): number => performance.now(),
   readFile,
 }
+
+const ShowTimingsSetting = 'heapSnapshotViewer.showTimings'
+const ToggleAggregatePrefix = 'toggle-aggregate:'
 
 const getSavedState = (context: HeapSnapshotViewContext | undefined): HeapSnapshotSavedState => {
   if (!context?.state || typeof context.state !== 'object') {
@@ -89,11 +115,14 @@ export const createInstanceWithDependencies = async (
   const uri = getUri(context, savedState)
   const id = context?.uid ?? 0
   const timings: HeapSnapshotTiming[] = []
+  const showTimings = (await dependencies.getPreference(ShowTimingsSetting)) === true
   const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
 
   try {
     await measure('create', () => CreateHeapSnapshot.createHeapSnapshot(id, content), dependencies.now, timings)
     await measure('pre-parse', () => PreparseHeapSnapshot.preparseHeapSnapshot(id), dependencies.now, timings)
+    const statistics = await measure('statistics', () => GetStatistics.getStatistics(id), dependencies.now, timings)
+    const snapshotSummary = GetSnapshotSummary.getSnapshotSummary(id)
     await measure('parse', () => ParseHeapSnapshot.parseHeapSnapshot(id), dependencies.now, timings)
     const aggregates = await measure(
       'aggregates',
@@ -103,7 +132,14 @@ export const createInstanceWithDependencies = async (
     )
     let state: HeapSnapshotViewState = {
       aggregates,
+      expandedNames: [],
       filterValue: getFilterValue(savedState),
+      memoryByType: statistics.memoryByType,
+      showTimings,
+      summary: {
+        ...snapshotSummary,
+        totalShallowSize: statistics.totalShallowSize,
+      },
       timings,
     }
 
@@ -112,6 +148,17 @@ export const createInstanceWithDependencies = async (
         DisposeHeapSnapshot.disposeHeapSnapshot(id)
       },
       handleEvent(event: Readonly<ViewEvent>): void {
+        if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
+          const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
+          const expandedNames = state.expandedNames.includes(aggregateName)
+            ? state.expandedNames.filter((name) => name !== aggregateName)
+            : [...state.expandedNames, aggregateName]
+          state = {
+            ...state,
+            expandedNames,
+          }
+          return
+        }
         if (event.type !== 'input' || event.name !== 'filter') {
           return
         }

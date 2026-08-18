@@ -6,6 +6,13 @@
   "browser": "dist/heapSnapshotViewerMain.js",
   "isolated": true,
   "workerName": "Heap Snapshot Viewer Extension Worker",
+  "configuration": {
+    "heapSnapshotViewer.showTimings": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show heap snapshot processing timings in the viewer."
+    }
+  },
   "activation": ["onView:builtin.heap-snapshot-viewer"],
   "languages": [],
   "views": [

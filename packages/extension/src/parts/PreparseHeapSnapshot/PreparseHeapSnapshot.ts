@@ -1,7 +1,7 @@
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 export const preparseHeapSnapshot = (id: number) => {
-  const { content } = HeapSnapshotState.get(id)
+  const { content, snapshotSize } = HeapSnapshotState.get(id)
   const heapsnapshot = JSON.parse(content)
   const { edges, nodes, snapshot, strings } = heapsnapshot
   const { meta } = snapshot
@@ -13,6 +13,8 @@ export const preparseHeapSnapshot = (id: number) => {
     nodeFields: node_fields,
     nodes: new Uint32Array(nodes),
     nodeTypes: node_types[0],
+    rootNodeIndex: snapshot.root_index || 0,
+    snapshotSize,
     strings,
   })
 }

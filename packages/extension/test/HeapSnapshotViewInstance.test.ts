@@ -47,6 +47,7 @@ test('reads and parses the heap snapshot in the extension worker', async () => {
   const readFile = jest.fn(async (_uri: string) => heapSnapshot)
   let time = 0
   const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
     now: () => time++,
     readFile,
   })
@@ -55,13 +56,16 @@ test('reads and parses the heap snapshot in the extension worker', async () => {
   const dom = instance.render()
   expect(dom.some((node) => node.text === 'Widget')).toBe(true)
   expect(dom.some((node) => node.text === 'Controller')).toBe(true)
-  expect(dom.some((node) => node.text === 'aggregates: 1.00')).toBe(true)
+  expect(dom.some((node) => node.text === 'Nodes')).toBe(true)
+  expect(dom.some((node) => node.text === '3')).toBe(true)
+  expect(dom.some((node) => node.text === 'Processing timings')).toBe(false)
 
   instance.dispose?.()
 })
 
 test('filters aggregates and saves lightweight view state', async () => {
   const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
     now: () => 0,
     readFile: async () => heapSnapshot,
   })
@@ -80,5 +84,26 @@ test('filters aggregates and saves lightweight view state', async () => {
     uri: '/workspace/test.heapsnapshot',
   })
 
+  instance.dispose?.()
+})
+
+test('reads the timing preference and expands aggregate details', async () => {
+  const getPreference = jest.fn(async (_key: string) => true)
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference,
+    now: () => 0,
+    readFile: async () => heapSnapshot,
+  })
+
+  expect(getPreference).toHaveBeenCalledWith('heapSnapshotViewer.showTimings')
+  expect(instance.render().some((node) => node.text === 'Processing timings')).toBe(true)
+
+  await instance.handleEvent?.({
+    name: 'toggle-aggregate:Widget',
+    type: 'click',
+  })
+
+  const dom = instance.render()
+  expect(dom.some((node) => node.text === 'Average shallow')).toBe(true)
   instance.dispose?.()
 })

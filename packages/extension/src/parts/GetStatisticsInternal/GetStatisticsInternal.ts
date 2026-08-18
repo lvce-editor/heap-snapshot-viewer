@@ -1,66 +1,58 @@
 import * as NodeFieldType from '../NodeFieldType/NodeFieldType.ts'
-import * as NodeType from '../NodeType/NodeType.ts'
+
+export interface MemoryByType {
+  readonly name: string
+  readonly size: number
+}
+
+export interface Statistics {
+  readonly memoryByType: readonly MemoryByType[]
+  readonly totalShallowSize: number
+}
+
+const MemoryTypeNames: Readonly<Record<string, string>> = {
+  array: 'Arrays',
+  bigint: 'Numbers',
+  closure: 'Closures',
+  code: 'Code',
+  'concatenated string': 'Strings',
+  hidden: 'System',
+  native: 'Native',
+  number: 'Numbers',
+  object: 'Objects',
+  'object shape': 'Object shapes',
+  regexp: 'Regular expressions',
+  'sliced string': 'Strings',
+  string: 'Strings',
+  symbol: 'Symbols',
+  synthetic: 'System',
+}
+
+const getMemoryTypeName = (type: string): string => {
+  return MemoryTypeNames[type] || (type ? `${type[0].toUpperCase()}${type.slice(1)}` : 'Other')
+}
 
 export const getStatisicsInternal = (
   nodes: Uint32Array,
   nodeFields: readonly string[],
   nodeTypes: readonly string[],
-  strings: readonly string[],
-) => {
+): Statistics => {
   const nodeFieldCount = nodeFields.length
   const selfSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
-  const nodeNameOffset = nodeFields.indexOf(NodeFieldType.Name)
-  const nodeNativeType = nodeTypes.indexOf(NodeType.Native)
-  const nodeStringType = nodeTypes.indexOf(NodeType.String)
-  const nodeConcatenatedStringType = nodeTypes.indexOf(NodeType.ConcatenatedString)
-  const nodeSlicedStringType = nodeTypes.indexOf(NodeType.SlicedString)
-  const nodeCodeType = nodeTypes.indexOf(NodeType.Code)
-  let sizeNative = 0
-  let sizeCode = 0
-  let sizeStrings = 0
-  const sizeJSArrays = 0
-  const sizeSystem = 0
-  for (let i = 0; i < nodes.length; i += nodeFieldCount) {
-    const selfSize = nodes[i + selfSizeOffset]
-    if (selfSize === 0) {
+  const sizeMap = new Map<string, number>()
+  let totalShallowSize = 0
+  for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += nodeFieldCount) {
+    const shallowSize = nodes[nodeIndex + selfSizeOffset]
+    if (shallowSize === 0) {
       continue
     }
-    const nodeType = nodes[i + nodeTypeOffset]
-    const nodeName = nodes[i + nodeNameOffset]
-    switch (nodeType) {
-      case nodeCodeType: {
-        sizeCode += selfSize
-
-        break
-      }
-      case nodeConcatenatedStringType:
-      case nodeSlicedStringType:
-      case nodeStringType: {
-        sizeStrings += selfSize
-
-        break
-      }
-      case nodeNativeType: {
-        sizeNative += selfSize
-
-        break
-      }
-      default: {
-        const name = strings[nodeName]
-        if (name === 'Array') {
-          // TODO compute size of array
-          // sizeJSArrays+=
-        }
-      }
-    }
+    const name = getMemoryTypeName(nodeTypes[nodes[nodeIndex + nodeTypeOffset]])
+    sizeMap.set(name, (sizeMap.get(name) || 0) + shallowSize)
+    totalShallowSize += shallowSize
   }
-
-  return {
-    sizeCode,
-    sizeJSArrays,
-    sizeNative,
-    sizeStrings,
-    sizeSystem,
-  }
+  const memoryByType = Array.from(sizeMap, ([name, size]) => ({ name, size })).sort(
+    (a, b) => b.size - a.size || a.name.localeCompare(b.name),
+  )
+  return { memoryByType, totalShallowSize }
 }
