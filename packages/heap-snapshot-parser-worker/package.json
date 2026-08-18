@@ -1,0 +1,34 @@
+{
+  "name": "heap-snapshot-parser-worker",
+  "version": "0.0.0-dev",
+  "description": "Heap snapshot parsing worker for Heap Snapshot Viewer",
+  "type": "module",
+  "main": "src/heapSnapshotParserWorkerMain.ts",
+  "private": true,
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
+  },
+  "dependencies": {
+    "@lvce-editor/rpc": "^6.18.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.4.1"
+  },
+  "jest": {
+    "injectGlobals": false,
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    }
+  }
+}

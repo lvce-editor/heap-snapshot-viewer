@@ -1,8 +1,8 @@
-import * as CreateHeapSnapshot from '../../extension/src/parts/CreateHeapSnapshot/CreateHeapSnapshot.ts'
-import * as GetAggregatesByClassName from '../../extension/src/parts/GetAggregatesByClassName/GetAggregatesByClassName.ts'
-import * as GetHeapSnapshot from '../../extension/src/parts/GetHeapSnapshot/GetHeapSnapshot.ts'
-import * as ParseHeapSnapshot from '../../extension/src/parts/ParseHeapSnapshot/ParseHeapSnapshot.ts'
-import * as PreparseHeapSnapshot from '../../extension/src/parts/PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
+import * as CreateHeapSnapshot from '../../heap-snapshot-parser-worker/src/parts/CreateHeapSnapshot/CreateHeapSnapshot.ts'
+import * as GetAggregatesByClassName from '../../heap-snapshot-parser-worker/src/parts/GetAggregatesByClassName/GetAggregatesByClassName.ts'
+import * as GetHeapSnapshot from '../../heap-snapshot-parser-worker/src/parts/GetHeapSnapshot/GetHeapSnapshot.ts'
+import * as ParseHeapSnapshot from '../../heap-snapshot-parser-worker/src/parts/ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import * as PreparseHeapSnapshot from '../../heap-snapshot-parser-worker/src/parts/PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
 
 const commandMap = {
   'HeapSnapshot.create': CreateHeapSnapshot.createHeapSnapshot,

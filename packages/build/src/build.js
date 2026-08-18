@@ -27,7 +27,13 @@ fs.cpSync(join(extension, 'media'), join(root, 'dist', 'media'), {
   recursive: true,
 })
 
-await bundleJs(join(extension, 'src', 'heapSnapshotViewerMain.ts'), join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js'))
+await Promise.all([
+  bundleJs(
+    join(root, 'packages', 'heap-snapshot-parser-worker', 'src', 'heapSnapshotParserWorkerMain.ts'),
+    join(root, 'dist', 'dist', 'heapSnapshotParserWorkerMain.js'),
+  ),
+  bundleJs(join(extension, 'src', 'heapSnapshotViewerMain.ts'), join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js')),
+])
 
 await packageExtension({
   highestCompression: true,

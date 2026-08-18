@@ -13,6 +13,15 @@
       "description": "Show heap snapshot processing timings in the viewer."
     }
   },
+  "rpc": [
+    {
+      "id": "builtin.heap-snapshot-viewer.parser-worker",
+      "type": "web-worker",
+      "name": "Heap Snapshot Parser Worker",
+      "url": "dist/heapSnapshotParserWorkerMain.js",
+      "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"]
+    }
+  ],
   "activation": ["onView:builtin.heap-snapshot-viewer"],
   "languages": [],
   "views": [

@@ -1,10 +1,6 @@
 import { text, VirtualDomElements, type VirtualDomNode } from '@lvce-editor/virtual-dom-worker'
-import type {
-  HeapSnapshotAggregate,
-  HeapSnapshotMemoryType,
-  HeapSnapshotSummary,
-  HeapSnapshotViewState,
-} from '../HeapSnapshotViewInstance/HeapSnapshotViewInstance.ts'
+import type { HeapSnapshotAggregate, HeapSnapshotMemoryType, HeapSnapshotSummary } from '../HeapSnapshot/HeapSnapshot.ts'
+import type { HeapSnapshotViewState } from '../HeapSnapshotViewInstance/HeapSnapshotViewInstance.ts'
 
 interface TreeNode {
   readonly children: readonly TreeNode[]

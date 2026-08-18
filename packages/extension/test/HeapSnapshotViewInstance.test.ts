@@ -34,6 +34,43 @@ const heapSnapshot = JSON.stringify({
   strings: ['(GC roots)', 'Widget', 'Controller', 'widget', 'controller'],
 })
 
+const parsedHeapSnapshot = {
+  aggregates: [
+    {
+      count: 1,
+      name: 'Widget',
+      retainedSize: 5,
+      shallowSize: 5,
+      type: 'object',
+    },
+    {
+      count: 1,
+      name: 'Controller',
+      retainedSize: 3,
+      shallowSize: 3,
+      type: 'object',
+    },
+  ],
+  memoryByType: [
+    {
+      name: 'Objects',
+      size: 8,
+    },
+  ],
+  summary: {
+    edgeCount: 2,
+    nodeCount: 3,
+    snapshotSize: heapSnapshot.length,
+    totalShallowSize: 8,
+  },
+  timings: [
+    {
+      name: 'parse',
+      time: 1,
+    },
+  ],
+}
+
 const context = {
   state: {
     filterValue: '',
@@ -43,16 +80,19 @@ const context = {
   viewId: 'builtin.heap-snapshot-viewer',
 } as unknown as ViewContext
 
-test('reads and parses the heap snapshot in the extension worker', async () => {
+test('reads the heap snapshot and delegates parsing to the parser worker', async () => {
   const readFile = jest.fn(async (_uri: string) => heapSnapshot)
+  const parseHeapSnapshot = jest.fn(async (_content: string) => parsedHeapSnapshot)
   let time = 0
   const instance = await createInstanceWithDependencies(context, {
     getPreference: async () => false,
     now: () => time++,
+    parseHeapSnapshot,
     readFile,
   })
 
   expect(readFile).toHaveBeenCalledWith('/workspace/test.heapsnapshot')
+  expect(parseHeapSnapshot).toHaveBeenCalledWith(heapSnapshot)
   const dom = instance.render()
   expect(dom.some((node) => node.text === 'Widget')).toBe(true)
   expect(dom.some((node) => node.text === 'Controller')).toBe(true)
@@ -67,6 +107,7 @@ test('filters aggregates and saves lightweight view state', async () => {
   const instance = await createInstanceWithDependencies(context, {
     getPreference: async () => false,
     now: () => 0,
+    parseHeapSnapshot: async () => parsedHeapSnapshot,
     readFile: async () => heapSnapshot,
   })
 
@@ -92,6 +133,7 @@ test('reads the timing preference and expands aggregate details', async () => {
   const instance = await createInstanceWithDependencies(context, {
     getPreference,
     now: () => 0,
+    parseHeapSnapshot: async () => parsedHeapSnapshot,
     readFile: async () => heapSnapshot,
   })
 
