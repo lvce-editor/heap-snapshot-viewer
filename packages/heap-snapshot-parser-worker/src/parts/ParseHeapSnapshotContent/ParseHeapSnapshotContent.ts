@@ -6,6 +6,7 @@ import * as GetAggregatesByClassName from '../GetAggregatesByClassName/GetAggreg
 import * as GetSnapshotSummary from '../GetSnapshotSummary/GetSnapshotSummary.ts'
 import * as GetStatistics from '../GetStatistics/GetStatistics.ts'
 import * as GetTime from '../GetTime/GetTime.ts'
+import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as PreparseHeapSnapshot from '../PreparseHeapSnapshot/PreparseHeapSnapshot.ts'
 
@@ -25,6 +26,16 @@ export interface ParsedHeapSnapshot {
   }
   readonly timings: readonly HeapSnapshotTiming[]
 }
+
+export type ParseHeapSnapshotResult =
+  | {
+      readonly type: 'success'
+      readonly value: ParsedHeapSnapshot
+    }
+  | {
+      readonly message: string
+      readonly type: 'validation-error'
+    }
 
 interface ParseHeapSnapshotContentDependencies {
   readonly id: number
@@ -83,4 +94,21 @@ export const parseHeapSnapshotContent = (content: string): ParsedHeapSnapshot =>
     id,
     now: GetTime.getTime,
   })
+}
+
+export const parseHeapSnapshotRequest = (content: string): ParseHeapSnapshotResult => {
+  try {
+    return {
+      type: 'success',
+      value: parseHeapSnapshotContent(content),
+    }
+  } catch (error) {
+    if (error instanceof HeapSnapshotValidationError) {
+      return {
+        message: error.message,
+        type: 'validation-error',
+      }
+    }
+    throw error
+  }
 }

@@ -1,5 +1,6 @@
 import type { ViewContext } from '@lvce-editor/api'
 import { expect, jest, test } from '@jest/globals'
+import { HeapSnapshotValidationError } from '../src/parts/HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
 import { createInstanceWithDependencies } from '../src/parts/HeapSnapshotViewInstance/HeapSnapshotViewInstance.ts'
 
 const heapSnapshot = JSON.stringify({
@@ -148,4 +149,17 @@ test('reads the timing preference and expands aggregate details', async () => {
   const dom = instance.render()
   expect(dom.some((node) => node.text === 'Average shallow')).toBe(true)
   instance.dispose?.()
+})
+
+test('renders validation errors returned by the parser worker', async () => {
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: async () => {
+      throw new HeapSnapshotValidationError('The file is not valid JSON.')
+    },
+    readFile: async () => 'not json',
+  })
+
+  expect(instance.render().some((node) => node.text === 'The file is not valid JSON.')).toBe(true)
 })

@@ -20,7 +20,9 @@ beforeEach(() => {
 test('starts the parser worker lazily and reuses its RPC connection', async () => {
   const firstSnapshot = { aggregates: [], memoryByType: [], summary: {}, timings: [] }
   const secondSnapshot = { aggregates: [], memoryByType: [], summary: {}, timings: [] }
-  invoke.mockResolvedValueOnce(firstSnapshot).mockResolvedValueOnce(secondSnapshot)
+  invoke
+    .mockResolvedValueOnce({ type: 'success', value: firstSnapshot })
+    .mockResolvedValueOnce({ type: 'success', value: secondSnapshot })
 
   await expect(HeapSnapshotParserWorker.parseHeapSnapshot('first snapshot')).resolves.toBe(firstSnapshot)
   await expect(HeapSnapshotParserWorker.parseHeapSnapshot('second snapshot')).resolves.toBe(secondSnapshot)
@@ -37,10 +39,22 @@ test('disposes an initialized worker and can be called before initialization', a
   await HeapSnapshotParserWorker.dispose()
   expect(dispose).not.toHaveBeenCalled()
 
-  invoke.mockResolvedValue({ aggregates: [], memoryByType: [], summary: {}, timings: [] })
+  invoke.mockResolvedValue({
+    type: 'success',
+    value: { aggregates: [], memoryByType: [], summary: {}, timings: [] },
+  })
   await HeapSnapshotParserWorker.parseHeapSnapshot('snapshot')
   await HeapSnapshotParserWorker.dispose()
 
   expect(dispose).toHaveBeenCalledTimes(1)
   expect(HeapSnapshotParserWorker.state.rpcPromise).toBeUndefined()
+})
+
+test('reconstructs validation errors from worker responses', async () => {
+  invoke.mockResolvedValue({ message: 'The file is empty.', type: 'validation-error' })
+
+  await expect(HeapSnapshotParserWorker.parseHeapSnapshot('')).rejects.toMatchObject({
+    message: 'The file is empty.',
+    name: 'HeapSnapshotValidationError',
+  })
 })

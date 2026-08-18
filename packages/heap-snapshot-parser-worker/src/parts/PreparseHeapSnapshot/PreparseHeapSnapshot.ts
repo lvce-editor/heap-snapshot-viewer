@@ -1,19 +1,18 @@
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import * as ValidateHeapSnapshot from '../ValidateHeapSnapshot/ValidateHeapSnapshot.ts'
 
 export const preparseHeapSnapshot = (id: number) => {
   const { content, snapshotSize } = HeapSnapshotState.get(id)
-  const heapsnapshot = JSON.parse(content)
-  const { edges, nodes, snapshot, strings } = heapsnapshot
-  const { meta } = snapshot
-  const { edge_fields, edge_types, node_fields, node_types } = meta
+  const { edgeFields, edges, edgeTypes, nodeFields, nodes, nodeTypes, rootNodeIndex, strings } =
+    ValidateHeapSnapshot.validateHeapSnapshot(content)
   HeapSnapshotState.add(id, {
-    edgeFields: edge_fields,
+    edgeFields,
     edges: new Uint32Array(edges),
-    edgeTypes: edge_types[0],
-    nodeFields: node_fields,
+    edgeTypes,
+    nodeFields,
     nodes: new Uint32Array(nodes),
-    nodeTypes: node_types[0],
-    rootNodeIndex: snapshot.root_index || 0,
+    nodeTypes,
+    rootNodeIndex,
     snapshotSize,
     strings,
   })

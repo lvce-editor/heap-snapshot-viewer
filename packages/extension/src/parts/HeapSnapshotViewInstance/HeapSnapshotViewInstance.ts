@@ -9,7 +9,8 @@ import type {
 } from '../HeapSnapshot/HeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import { parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
-import { render } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
+import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
+import { render, renderError } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
 export interface HeapSnapshotViewState {
   readonly aggregates: readonly HeapSnapshotAggregate[]
@@ -85,6 +86,22 @@ const measure = async <T>(
   return result
 }
 
+const createErrorInstance = (uri: string, error: unknown): HeapSnapshotViewInstance => {
+  const message =
+    error instanceof HeapSnapshotValidationError
+      ? error.message
+      : 'The heap snapshot could not be processed because its data is inconsistent.'
+  return {
+    dispose(): void {},
+    render(): readonly VirtualDomNode[] {
+      return renderError(message)
+    },
+    saveState(): HeapSnapshotSavedState {
+      return { uri }
+    },
+  }
+}
+
 export const createInstanceWithDependencies = async (
   context: HeapSnapshotViewContext | undefined,
   dependencies: HeapSnapshotViewDependencies,
@@ -93,53 +110,58 @@ export const createInstanceWithDependencies = async (
   const uri = getUri(context, savedState)
   const timings: HeapSnapshotTiming[] = []
   const showTimings = (await dependencies.getPreference(ShowTimingsSetting)) === true
-  const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
-  const parsed = await dependencies.parseHeapSnapshot(content)
-  let state: HeapSnapshotViewState = {
-    aggregates: parsed.aggregates,
-    expandedNames: [],
-    filterValue: getFilterValue(savedState),
-    memoryByType: parsed.memoryByType,
-    showTimings,
-    summary: parsed.summary,
-    timings: [...timings, ...parsed.timings],
-  }
 
-  return {
-    dispose(): void {},
-    handleEvent(event: Readonly<ViewEvent>): void {
-      if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
-        const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
-        const expandedNames = state.expandedNames.includes(aggregateName)
-          ? state.expandedNames.filter((name) => name !== aggregateName)
-          : [...state.expandedNames, aggregateName]
+  try {
+    const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
+    const parsed = await dependencies.parseHeapSnapshot(content)
+    let state: HeapSnapshotViewState = {
+      aggregates: parsed.aggregates,
+      expandedNames: [],
+      filterValue: getFilterValue(savedState),
+      memoryByType: parsed.memoryByType,
+      showTimings,
+      summary: parsed.summary,
+      timings: [...timings, ...parsed.timings],
+    }
+
+    return {
+      dispose(): void {},
+      handleEvent(event: Readonly<ViewEvent>): void {
+        if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
+          const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
+          const expandedNames = state.expandedNames.includes(aggregateName)
+            ? state.expandedNames.filter((name) => name !== aggregateName)
+            : [...state.expandedNames, aggregateName]
+          state = {
+            ...state,
+            expandedNames,
+          }
+          return
+        }
+        if (event.type !== 'input' || event.name !== 'filter') {
+          return
+        }
+        const filterValue = typeof event.value === 'string' ? event.value : ''
         state = {
           ...state,
-          expandedNames,
+          filterValue,
         }
-        return
-      }
-      if (event.type !== 'input' || event.name !== 'filter') {
-        return
-      }
-      const filterValue = typeof event.value === 'string' ? event.value : ''
-      state = {
-        ...state,
-        filterValue,
-      }
-    },
-    render(): readonly VirtualDomNode[] {
-      return render({
-        ...state,
-        aggregates: FilterAggregates.filterAggregates([...state.aggregates], state.filterValue),
-      })
-    },
-    saveState(): HeapSnapshotSavedState {
-      return {
-        filterValue: state.filterValue,
-        uri,
-      }
-    },
+      },
+      render(): readonly VirtualDomNode[] {
+        return render({
+          ...state,
+          aggregates: FilterAggregates.filterAggregates([...state.aggregates], state.filterValue),
+        })
+      },
+      saveState(): HeapSnapshotSavedState {
+        return {
+          filterValue: state.filterValue,
+          uri,
+        }
+      },
+    }
+  } catch (error) {
+    return createErrorInstance(uri, error)
   }
 }
 

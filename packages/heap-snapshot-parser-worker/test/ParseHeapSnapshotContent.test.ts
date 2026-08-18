@@ -1,6 +1,9 @@
 import { expect, test } from '@jest/globals'
 import * as HeapSnapshotState from '../src/parts/HeapSnapshotState/HeapSnapshotState.ts'
-import { parseHeapSnapshotContentWithDependencies } from '../src/parts/ParseHeapSnapshotContent/ParseHeapSnapshotContent.ts'
+import {
+  parseHeapSnapshotContentWithDependencies,
+  parseHeapSnapshotRequest,
+} from '../src/parts/ParseHeapSnapshotContent/ParseHeapSnapshotContent.ts'
 
 const heapSnapshot = JSON.stringify({
   edges: [2, 3, 7, 2, 4, 14],
@@ -61,13 +64,20 @@ test('parses a heap snapshot into render-ready data', () => {
   ])
 })
 
-test('cleans up parser state when parsing fails', () => {
+test('cleans up parser state when validation fails', () => {
   expect(() =>
     parseHeapSnapshotContentWithDependencies('not json', {
       id: 2,
       now: () => 0,
     }),
-  ).toThrow(SyntaxError)
+  ).toThrow('The file is not valid JSON.')
 
   expect(HeapSnapshotState.get(2)).toBeUndefined()
+})
+
+test('returns serializable validation errors from the RPC command', () => {
+  expect(parseHeapSnapshotRequest('')).toEqual({
+    message: 'The file is empty. Select a non-empty .heapsnapshot file and try again.',
+    type: 'validation-error',
+  })
 })

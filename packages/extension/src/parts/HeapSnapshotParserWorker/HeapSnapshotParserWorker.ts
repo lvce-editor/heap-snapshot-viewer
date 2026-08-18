@@ -1,5 +1,6 @@
 import { createRpc } from '@lvce-editor/api'
 import type { ParsedHeapSnapshot } from '../HeapSnapshot/HeapSnapshot.ts'
+import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
 
 interface Rpc {
   readonly dispose: () => Promise<void> | void
@@ -28,7 +29,19 @@ const getRpc = (): Promise<Rpc> => {
 
 export const parseHeapSnapshot = async (content: string): Promise<ParsedHeapSnapshot> => {
   const rpc = await getRpc()
-  return rpc.invoke('HeapSnapshotParser.parse', content) as Promise<ParsedHeapSnapshot>
+  const result = (await rpc.invoke('HeapSnapshotParser.parse', content)) as
+    | {
+        readonly message: string
+        readonly type: 'validation-error'
+      }
+    | {
+        readonly type: 'success'
+        readonly value: ParsedHeapSnapshot
+      }
+  if (result.type === 'validation-error') {
+    throw new HeapSnapshotValidationError(result.message)
+  }
+  return result.value
 }
 
 export const dispose = async (): Promise<void> => {
