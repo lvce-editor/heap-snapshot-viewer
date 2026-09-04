@@ -9,10 +9,10 @@ import type {
 } from '../HeapSnapshot/HeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import { parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
-import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
 import { render, renderError } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
 export interface HeapSnapshotViewState {
+  readonly aggregatePage: number
   readonly aggregates: readonly HeapSnapshotAggregate[]
   readonly expandedNames: readonly string[]
   readonly filterValue: string
@@ -88,9 +88,7 @@ const measure = async <T>(
 
 const createErrorInstance = (uri: string, error: unknown): HeapSnapshotViewInstance => {
   const message =
-    error instanceof HeapSnapshotValidationError
-      ? error.message
-      : 'The heap snapshot could not be processed because its data is inconsistent.'
+    error instanceof Error ? error.message : 'The heap snapshot could not be processed because its data is inconsistent.'
   return {
     dispose(): void {},
     render(): readonly VirtualDomNode[] {
@@ -115,6 +113,7 @@ export const createInstanceWithDependencies = async (
     const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
     const parsed = await dependencies.parseHeapSnapshot(content)
     let state: HeapSnapshotViewState = {
+      aggregatePage: 0,
       aggregates: parsed.aggregates,
       expandedNames: [],
       filterValue: getFilterValue(savedState),
@@ -127,6 +126,20 @@ export const createInstanceWithDependencies = async (
     return {
       dispose(): void {},
       handleEvent(event: Readonly<ViewEvent>): void {
+        if (event.type === 'click' && event.name === 'previous-page') {
+          state = {
+            ...state,
+            aggregatePage: Math.max(0, state.aggregatePage - 1),
+          }
+          return
+        }
+        if (event.type === 'click' && event.name === 'next-page') {
+          state = {
+            ...state,
+            aggregatePage: state.aggregatePage + 1,
+          }
+          return
+        }
         if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
           const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
           const expandedNames = state.expandedNames.includes(aggregateName)
@@ -144,6 +157,7 @@ export const createInstanceWithDependencies = async (
         const filterValue = typeof event.value === 'string' ? event.value : ''
         state = {
           ...state,
+          aggregatePage: 0,
           filterValue,
         }
       },

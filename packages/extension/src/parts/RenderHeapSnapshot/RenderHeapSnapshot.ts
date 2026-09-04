@@ -9,6 +9,7 @@ interface TreeNode {
 
 const ToggleAggregatePrefix = 'toggle-aggregate:'
 const CountFormatter = new Intl.NumberFormat('en-US')
+const AggregatePageSize = 500
 
 const textNode = (value: string): TreeNode => ({
   children: [],
@@ -126,12 +127,48 @@ const renderTableHeader = (): TreeNode => {
 
 const renderTable = (
   aggregates: readonly HeapSnapshotAggregate[],
+  aggregatePage: number,
   expandedNames: readonly string[],
   summary: HeapSnapshotSummary,
 ): TreeNode => {
-  const rows = aggregates.flatMap((aggregate) => renderAggregate(aggregate, expandedNames.includes(aggregate.name), summary))
+  const start = aggregatePage * AggregatePageSize
+  const visibleAggregates = aggregates.slice(start, start + AggregatePageSize)
+  const rows = visibleAggregates.flatMap((aggregate) =>
+    renderAggregate(aggregate, expandedNames.includes(aggregate.name), summary),
+  )
   const body = node(VirtualDomElements.TBody, { className: 'HeapSnapshotTableBody' }, rows)
   return node(VirtualDomElements.Table, { className: 'HeapSnapshotTable' }, [renderTableHeader(), body])
+}
+
+const renderPaginationButton = (label: string, name: string, disabled: boolean): TreeNode => {
+  return node(
+    VirtualDomElements.Button,
+    {
+      className: 'HeapSnapshotPaginationButton',
+      disabled,
+      name,
+      onClick: 'handleClick',
+      type: 'button',
+    },
+    [textNode(label)],
+  )
+}
+
+const renderPagination = (aggregatePage: number, aggregateCount: number): TreeNode | undefined => {
+  if (aggregateCount <= AggregatePageSize) {
+    return undefined
+  }
+  const start = aggregatePage * AggregatePageSize
+  const end = Math.min(start + AggregatePageSize, aggregateCount)
+  const label = span(
+    'HeapSnapshotPaginationLabel',
+    `Showing ${formatCount(start + 1)}–${formatCount(end)} of ${formatCount(aggregateCount)} constructors`,
+  )
+  return node(VirtualDomElements.Nav, { ariaLabel: 'Heap snapshot constructor pages', className: 'HeapSnapshotPagination' }, [
+    renderPaginationButton('Previous', 'previous-page', aggregatePage === 0),
+    label,
+    renderPaginationButton('Next', 'next-page', end === aggregateCount),
+  ])
 }
 
 const renderMetadataItem = (label: string, value: string): TreeNode => {
@@ -207,11 +244,13 @@ const renderTimings = (timings: HeapSnapshotViewState['timings']): TreeNode => {
 }
 
 export const render = (state: Readonly<HeapSnapshotViewState>): readonly VirtualDomNode[] => {
+  const pagination = renderPagination(state.aggregatePage, state.aggregates.length)
   const children = [
     renderFilter(state.filterValue, state.summary),
     renderMemoryByType(state.memoryByType, state.summary),
     ...(state.showTimings ? [renderTimings(state.timings)] : []),
-    renderTable(state.aggregates, state.expandedNames, state.summary),
+    ...(pagination ? [pagination] : []),
+    renderTable(state.aggregates, state.aggregatePage, state.expandedNames, state.summary),
   ]
   const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView' }, children)
   return flatten(root)

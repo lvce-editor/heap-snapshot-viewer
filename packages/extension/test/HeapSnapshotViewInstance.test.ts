@@ -163,3 +163,43 @@ test('renders validation errors returned by the parser worker', async () => {
 
   expect(instance.render().some((node) => node.text === 'The file is not valid JSON.')).toBe(true)
 })
+
+test('renders file system errors without describing valid data as inconsistent', async () => {
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: async () => parsedHeapSnapshot,
+    readFile: async () => {
+      throw new Error('path must be a valid file uri')
+    },
+  })
+
+  expect(instance.render().some((node) => node.text === 'path must be a valid file uri')).toBe(true)
+})
+
+test('moves between bounded aggregate pages and resets the page when filtering', async () => {
+  const aggregates = Array.from({ length: 501 }, (_, index) => ({
+    count: 1,
+    name: `Class${index}`,
+    retainedSize: 1,
+    shallowSize: 1,
+    type: 'object',
+  }))
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: async () => ({ ...parsedHeapSnapshot, aggregates }),
+    readFile: async () => heapSnapshot,
+  })
+
+  expect(instance.render().filter((node) => node.className === 'HeapSnapshotClassName')).toHaveLength(500)
+
+  await instance.handleEvent?.({ name: 'next-page', type: 'click' })
+
+  expect(instance.render().filter((node) => node.className === 'HeapSnapshotClassName')).toHaveLength(1)
+  expect(instance.render().some((node) => node.text === 'Class500')).toBe(true)
+
+  await instance.handleEvent?.({ name: 'filter', type: 'input', value: 'Class0' })
+
+  expect(instance.render().some((node) => node.text === 'Class0')).toBe(true)
+})
