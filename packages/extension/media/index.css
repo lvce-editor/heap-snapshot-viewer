@@ -205,6 +205,43 @@
   font-variant-numeric: tabular-nums;
 }
 
+.HeapSnapshotPagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 16px 20px 0;
+}
+
+.HeapSnapshotPaginationLabel {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-variant-numeric: tabular-nums;
+}
+
+.HeapSnapshotPaginationButton {
+  padding: 5px 10px;
+  color: var(--ButtonForeground, #ffffff);
+  border: 0;
+  border-radius: 3px;
+  background: var(--ButtonBackground, #0e639c);
+  cursor: pointer;
+  font: inherit;
+}
+
+.HeapSnapshotPaginationButton:hover:not(:disabled) {
+  background: var(--ButtonHoverBackground, #1177bb);
+}
+
+.HeapSnapshotPaginationButton:focus-visible {
+  outline: 1px solid var(--FocusBorder, #007fd4);
+  outline-offset: 2px;
+}
+
+.HeapSnapshotPaginationButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .HeapSnapshotTable {
   width: calc(100% - 40px);
   table-layout: fixed;

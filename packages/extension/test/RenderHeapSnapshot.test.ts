@@ -3,6 +3,7 @@ import { VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import { render } from '../src/parts/RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
 const state = {
+  aggregatePage: 0,
   aggregates: [
     {
       count: 2,
@@ -106,4 +107,23 @@ test('renders expanded aggregate details and an expanded disclosure', () => {
   })
   expect(dom.some((node) => node.text === 'Average shallow')).toBe(true)
   expect(dom.some((node) => node.text === '32 B')).toBe(true)
+})
+
+test('bounds the number of rendered aggregate rows', () => {
+  const aggregates = Array.from({ length: 10_000 }, (_, index) => ({
+    count: 1,
+    name: `Class${index}`,
+    retainedSize: 1,
+    shallowSize: 1,
+    type: 'object',
+  }))
+
+  const dom = render({
+    ...state,
+    aggregates,
+  })
+
+  expect(dom.filter((node) => node.className === 'HeapSnapshotClassName')).toHaveLength(500)
+  expect(dom.some((node) => node.text === 'Showing 1–500 of 10,000 constructors')).toBe(true)
+  expect(dom.length).toBeLessThan(6000)
 })
