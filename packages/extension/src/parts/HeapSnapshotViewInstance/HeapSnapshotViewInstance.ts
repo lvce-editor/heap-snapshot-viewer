@@ -22,6 +22,8 @@ export interface HeapSnapshotViewState {
   readonly timings: readonly HeapSnapshotTiming[]
 }
 
+export type HeapSnapshotComponentState = HeapSnapshotViewState | { readonly errorMessage: string }
+
 interface HeapSnapshotViewContext extends ViewContext {
   readonly uri?: string
 }
@@ -32,8 +34,10 @@ interface HeapSnapshotSavedState {
 }
 
 export interface HeapSnapshotViewInstance extends VirtualDomViewInstance {
+  readonly getComponentState: () => HeapSnapshotComponentState
   readonly render: () => readonly VirtualDomNode[]
   readonly saveState: () => HeapSnapshotSavedState
+  readonly setComponentState: (state: HeapSnapshotComponentState) => void
 }
 
 export interface HeapSnapshotViewDependencies {
@@ -87,15 +91,24 @@ const measure = async <T>(
 }
 
 const createErrorInstance = (uri: string, error: unknown): HeapSnapshotViewInstance => {
-  const message =
+  let message =
     error instanceof Error ? error.message : 'The heap snapshot could not be processed because its data is inconsistent.'
   return {
     dispose(): void {},
+    getComponentState(): HeapSnapshotComponentState {
+      return { errorMessage: message }
+    },
     render(): readonly VirtualDomNode[] {
       return renderError(message)
     },
     saveState(): HeapSnapshotSavedState {
       return { uri }
+    },
+    setComponentState(state: HeapSnapshotComponentState): void {
+      if (!('errorMessage' in state)) {
+        throw new Error('Expected heap snapshot error state')
+      }
+      message = state.errorMessage
     },
   }
 }
@@ -125,6 +138,9 @@ export const createInstanceWithDependencies = async (
 
     return {
       dispose(): void {},
+      getComponentState(): HeapSnapshotComponentState {
+        return state
+      },
       handleEvent(event: Readonly<ViewEvent>): void {
         if (event.type === 'click' && event.name === 'previous-page') {
           state = {
@@ -172,6 +188,12 @@ export const createInstanceWithDependencies = async (
           filterValue: state.filterValue,
           uri,
         }
+      },
+      setComponentState(newState: HeapSnapshotComponentState): void {
+        if ('errorMessage' in newState) {
+          throw new Error('Expected heap snapshot state')
+        }
+        state = newState
       },
     }
   } catch (error) {
