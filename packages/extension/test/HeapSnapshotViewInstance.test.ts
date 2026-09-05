@@ -203,3 +203,32 @@ test('moves between bounded aggregate pages and resets the page when filtering',
 
   expect(instance.render().some((node) => node.text === 'Class0')).toBe(true)
 })
+
+test('component state exposes parsed data and edits the live filter', async () => {
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: async () => parsedHeapSnapshot,
+    readFile: async () => heapSnapshot,
+  })
+  expect(instance.getComponentState()).toMatchObject({ summary: parsedHeapSnapshot.summary })
+  instance.setComponentState({ ...instance.getComponentState(), filterValue: 'Widget' })
+  expect(JSON.stringify(instance.render())).toContain('Widget')
+  expect(JSON.stringify(instance.render())).not.toContain('Controller')
+  await instance.handleEvent?.({ name: 'filter', type: 'input', value: 'Controller' })
+  expect(instance.getComponentState()).toMatchObject({ filterValue: 'Controller' })
+})
+
+test('component state is available for a heap snapshot error', async () => {
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: async () => parsedHeapSnapshot,
+    readFile: async () => {
+      throw new Error('Missing file')
+    },
+  })
+  expect(instance.getComponentState()).toEqual({ errorMessage: 'Missing file' })
+  instance.setComponentState({ errorMessage: 'Inspector error' })
+  expect(JSON.stringify(instance.render())).toContain('Inspector error')
+})
