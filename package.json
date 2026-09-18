@@ -22,11 +22,11 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@lvce-editor/eslint-config": "^18.5.0",
-    "@types/node": "^26.2.0",
-    "eslint": "^10.8.1",
-    "jest": "^30.4.2",
-    "prettier": "^3.9.6",
+    "@lvce-editor/eslint-config": "^18.14.0",
+    "@types/node": "^26.6.1",
+    "eslint": "^10.10.0",
+    "jest": "^30.5.1",
+    "prettier": "^3.9.8",
     "ts-jest": "^29.4.12",
     "typescript": "^6.0.0"
   },
