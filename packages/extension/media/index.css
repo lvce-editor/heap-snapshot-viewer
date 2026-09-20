@@ -8,6 +8,35 @@
   background: var(--EditorBackground, #1f1f1f);
   font-family: var(--EditorFontFamily, sans-serif);
   font-size: 13px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vscode-scrollbarSlider-background, var(--EditorScrollBarBackground, rgba(57, 71, 71, 0.6))) transparent;
+}
+
+.HeapSnapshotView::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.HeapSnapshotView::-webkit-scrollbar-track,
+.HeapSnapshotView::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.HeapSnapshotView::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--vscode-scrollbarSlider-background, var(--EditorScrollBarBackground, rgba(57, 71, 71, 0.6)));
+  background-clip: content-box;
+}
+
+.HeapSnapshotView::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground, var(--EditorScrollBarBackground, rgba(57, 71, 71, 0.6)));
+  background-clip: content-box;
+}
+
+.HeapSnapshotView::-webkit-scrollbar-thumb:active {
+  background: var(--vscode-scrollbarSlider-activeBackground, var(--EditorScrollBarBackground, rgba(57, 71, 71, 0.6)));
+  background-clip: content-box;
 }
 
 .HeapSnapshotViewError {
