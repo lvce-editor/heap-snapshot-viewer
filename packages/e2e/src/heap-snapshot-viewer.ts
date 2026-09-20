@@ -34,7 +34,7 @@ const basicHeapSnapshot = JSON.stringify({
   strings: ['(GC roots)', 'Widget', 'Controller', 'widget', 'controller'],
 })
 
-export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Workspace }) => {
+export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/test.heapsnapshot`, basicHeapSnapshot)
   await Workspace.setPath(tmpDir)
@@ -76,7 +76,6 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, W
   await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
   // eslint-disable-next-line e2e/no-direct-click -- This extension-local disclosure does not have a shared page object.
   await disclosure.click()
-  await Command.execute('Timeout.sleep', 200)
   const details = Locator('.HeapSnapshotAggregateDetails')
   await expect(details).toBeVisible()
   await expect(disclosure).toHaveAttribute('aria-expanded', 'true')
@@ -86,7 +85,6 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, W
   const filterInput = Locator('.HeapSnapshotFilterInputWrapper > .HeapSnapshotFilterInput')
   await filterInput.type('controller')
   await expect(filterInput).toHaveValue('controller')
-  await new Promise((resolve) => setTimeout(resolve, 100))
 
   const filteredConstructors = Locator('.HeapSnapshotClassName')
   await expect(filteredConstructors).toHaveCount(1)
