@@ -75,6 +75,28 @@ test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () =
   expect(dom.some((node) => node.text === '× 2')).toBe(true)
   expect(classNames.every((className) => className.startsWith('HeapSnapshot'))).toBe(true)
   expect(classNames).toContain('HeapSnapshotTable')
+  expect(dom).toContainEqual({
+    childCount: 3,
+    className: 'HeapSnapshotTableColumnGroup',
+    type: VirtualDomElements.ColGroup,
+  })
+  expect(dom.filter((node) => node.type === VirtualDomElements.Col)).toEqual([
+    {
+      childCount: 0,
+      className: 'HeapSnapshotTableColumnConstructor',
+      type: VirtualDomElements.Col,
+    },
+    {
+      childCount: 0,
+      className: 'HeapSnapshotTableColumnShallowSize',
+      type: VirtualDomElements.Col,
+    },
+    {
+      childCount: 0,
+      className: 'HeapSnapshotTableColumnRetainedSize',
+      type: VirtualDomElements.Col,
+    },
+  ])
 })
 
 test('shows processing timings only when enabled', () => {

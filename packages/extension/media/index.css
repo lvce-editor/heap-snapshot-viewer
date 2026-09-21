@@ -280,6 +280,15 @@
   cursor: default;
 }
 
+.HeapSnapshotTableColumnConstructor {
+  width: 60%;
+}
+
+.HeapSnapshotTableColumnShallowSize,
+.HeapSnapshotTableColumnRetainedSize {
+  width: 20%;
+}
+
 .HeapSnapshotTableHeader,
 .HeapSnapshotTableHeaderRow,
 .HeapSnapshotTableBodyRow,
@@ -306,15 +315,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.055em;
-}
-
-.HeapSnapshotTableHeaderCell:first-child {
-  width: 60%;
-}
-
-.HeapSnapshotTableHeaderCell:nth-child(2),
-.HeapSnapshotTableHeaderCell:nth-child(3) {
-  width: 20%;
 }
 
 .HeapSnapshotTableBodyRow {
@@ -455,12 +455,12 @@
     grid-template-columns: repeat(2, minmax(100px, 1fr));
   }
 
-  .HeapSnapshotTableHeaderCell:first-child {
+  .HeapSnapshotTableColumnConstructor {
     width: 50%;
   }
 
-  .HeapSnapshotTableHeaderCell:nth-child(2),
-  .HeapSnapshotTableHeaderCell:nth-child(3) {
+  .HeapSnapshotTableColumnShallowSize,
+  .HeapSnapshotTableColumnRetainedSize {
     width: 25%;
   }
 }
