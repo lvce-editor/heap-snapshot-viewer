@@ -125,6 +125,15 @@ const renderTableHeader = (): TreeNode => {
   return node(VirtualDomElements.THead, { className: 'HeapSnapshotTableHeader' }, [row])
 }
 
+const renderTableColumnGroup = (): TreeNode => {
+  const columns = [
+    node(VirtualDomElements.Col, { className: 'HeapSnapshotTableColumnConstructor' }),
+    node(VirtualDomElements.Col, { className: 'HeapSnapshotTableColumnShallowSize' }),
+    node(VirtualDomElements.Col, { className: 'HeapSnapshotTableColumnRetainedSize' }),
+  ]
+  return node(VirtualDomElements.ColGroup, { className: 'HeapSnapshotTableColumnGroup' }, columns)
+}
+
 const renderTable = (
   aggregates: readonly HeapSnapshotAggregate[],
   aggregatePage: number,
@@ -137,7 +146,7 @@ const renderTable = (
     renderAggregate(aggregate, expandedNames.includes(aggregate.name), summary),
   )
   const body = node(VirtualDomElements.TBody, { className: 'HeapSnapshotTableBody' }, rows)
-  return node(VirtualDomElements.Table, { className: 'HeapSnapshotTable' }, [renderTableHeader(), body])
+  return node(VirtualDomElements.Table, { className: 'HeapSnapshotTable' }, [renderTableColumnGroup(), renderTableHeader(), body])
 }
 
 const renderPaginationButton = (label: string, name: string, disabled: boolean): TreeNode => {
