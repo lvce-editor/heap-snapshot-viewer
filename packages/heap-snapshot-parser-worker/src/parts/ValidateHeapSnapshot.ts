@@ -1,11 +1,11 @@
-import { HeapSnapshotValidationError } from '../HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
+import { HeapSnapshotValidationError } from './HeapSnapshotValidationError.ts'
 
 export interface ValidatedHeapSnapshot {
   readonly edgeFields: readonly string[]
-  readonly edges: readonly number[]
+  readonly edges: Uint32Array
   readonly edgeTypes: readonly string[]
   readonly nodeFields: readonly string[]
-  readonly nodes: readonly number[]
+  readonly nodes: Uint32Array
   readonly nodeTypes: readonly string[]
   readonly rootNodeIndex: number
   readonly strings: readonly string[]
@@ -177,10 +177,10 @@ export const validateHeapSnapshot = (content: string): ValidatedHeapSnapshot => 
 
   return {
     edgeFields,
-    edges,
+    edges: new Uint32Array(edges),
     edgeTypes,
     nodeFields,
-    nodes,
+    nodes: new Uint32Array(nodes),
     nodeTypes,
     rootNodeIndex,
     strings,

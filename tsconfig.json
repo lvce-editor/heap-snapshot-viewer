@@ -4,6 +4,7 @@
   "references": [
     { "path": "./packages/extension" },
     { "path": "./packages/heap-snapshot-parser-worker" },
+    { "path": "./packages/heap-snapshot-analysis-worker" },
     { "path": "./packages/e2e" },
     { "path": "./packages/build" }
   ]

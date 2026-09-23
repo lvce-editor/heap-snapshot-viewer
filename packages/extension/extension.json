@@ -20,6 +20,13 @@
       "name": "Heap Snapshot Parser Worker",
       "url": "dist/heapSnapshotParserWorkerMain.js",
       "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"]
+    },
+    {
+      "id": "builtin.heap-snapshot-viewer.analysis-worker",
+      "type": "web-worker",
+      "name": "Heap Snapshot Analysis Worker",
+      "url": "dist/heapSnapshotAnalysisWorkerMain.js",
+      "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"]
     }
   ],
   "activation": ["onView:builtin.heap-snapshot-viewer"],

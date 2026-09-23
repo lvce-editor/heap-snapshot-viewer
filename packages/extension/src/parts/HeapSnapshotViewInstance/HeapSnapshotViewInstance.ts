@@ -1,5 +1,12 @@
 import type { VirtualDomNode } from '@lvce-editor/virtual-dom-worker'
-import { getPreference, readFile, type ViewContext, type ViewEvent, type VirtualDomViewInstance } from '@lvce-editor/api'
+import {
+  getPreference,
+  readFile,
+  readFileAsBlob,
+  type ViewContext,
+  type ViewEvent,
+  type VirtualDomViewInstance,
+} from '@lvce-editor/api'
 import type {
   HeapSnapshotAggregate,
   HeapSnapshotMemoryType,
@@ -43,15 +50,21 @@ export interface HeapSnapshotViewInstance extends VirtualDomViewInstance {
 export interface HeapSnapshotViewDependencies {
   readonly getPreference: (key: string) => Promise<unknown>
   readonly now: () => number
-  readonly parseHeapSnapshot: (content: string) => Promise<ParsedHeapSnapshot>
-  readonly readFile: (uri: string) => Promise<string>
+  readonly parseHeapSnapshot: (blob: Blob) => Promise<ParsedHeapSnapshot>
+  readonly readFileAsBlob: (uri: string) => Promise<Blob>
 }
 
 const defaultDependencies: HeapSnapshotViewDependencies = {
   getPreference,
   now: (): number => performance.now(),
   parseHeapSnapshot,
-  readFile,
+  readFileAsBlob: async (uri: string): Promise<Blob> => {
+    try {
+      return await readFileAsBlob(uri)
+    } catch {
+      return new Blob([await readFile(uri)])
+    }
+  },
 }
 
 const ShowTimingsSetting = 'heapSnapshotViewer.showTimings'
@@ -123,8 +136,8 @@ export const createInstanceWithDependencies = async (
   const showTimings = (await dependencies.getPreference(ShowTimingsSetting)) === true
 
   try {
-    const content = await measure('read-file', () => dependencies.readFile(uri), dependencies.now, timings)
-    const parsed = await dependencies.parseHeapSnapshot(content)
+    const blob = await measure('read-file', () => dependencies.readFileAsBlob(uri), dependencies.now, timings)
+    const parsed = await dependencies.parseHeapSnapshot(blob)
     let state: HeapSnapshotViewState = {
       aggregatePage: 0,
       aggregates: parsed.aggregates,
