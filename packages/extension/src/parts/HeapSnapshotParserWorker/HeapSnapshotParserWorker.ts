@@ -9,47 +9,72 @@ interface Rpc {
 
 type CreateRpc = (options: { readonly id: string }) => Promise<Rpc>
 
-export const state: {
-  createRpc: CreateRpc
-  rpcPromise: Promise<Rpc> | undefined
-} = {
-  createRpc,
-  rpcPromise: undefined,
+interface ParsedHeapSnapshotData {
+  readonly edgeFields: readonly string[]
+  readonly edges: Uint32Array
+  readonly edgeTypes: readonly string[]
+  readonly nodeFields: readonly string[]
+  readonly nodes: Uint32Array
+  readonly nodeTypes: readonly string[]
+  readonly rootNodeIndex: number
+  readonly snapshotSize: number
+  readonly strings: readonly string[]
 }
 
-const getRpc = (): Promise<Rpc> => {
-  const { createRpc: createRpcFunction, rpcPromise } = state
+export const state: {
+  createRpc: CreateRpc
+  analysisRpcPromise: Promise<Rpc> | undefined
+  parserRpcPromise: Promise<Rpc> | undefined
+} = {
+  analysisRpcPromise: undefined,
+  createRpc,
+  parserRpcPromise: undefined,
+}
+
+const getRpc = (kind: 'analysis' | 'parser'): Promise<Rpc> => {
+  const id = `builtin.heap-snapshot-viewer.${kind}-worker`
+  const rpcPromise = kind === 'parser' ? state.parserRpcPromise : state.analysisRpcPromise
   if (rpcPromise) {
     return rpcPromise
   }
-  const newRpcPromise = createRpcFunction({ id: 'builtin.heap-snapshot-viewer.parser-worker' })
-  state.rpcPromise = newRpcPromise
+  const newRpcPromise = state.createRpc({ id })
+  if (kind === 'parser') {
+    state.parserRpcPromise = newRpcPromise
+  } else {
+    state.analysisRpcPromise = newRpcPromise
+  }
   return newRpcPromise
 }
 
-export const parseHeapSnapshot = async (content: string): Promise<ParsedHeapSnapshot> => {
-  const rpc = await getRpc()
-  const result = (await rpc.invoke('HeapSnapshotParser.parse', content)) as
+export const parseHeapSnapshot = async (blob: Blob): Promise<ParsedHeapSnapshot> => {
+  const parserRpc = await getRpc('parser')
+  const result = (await parserRpc.invoke('HeapSnapshotParser.parseBlob', blob)) as
     | {
         readonly message: string
         readonly type: 'validation-error'
       }
     | {
         readonly type: 'success'
-        readonly value: ParsedHeapSnapshot
+        readonly value: ParsedHeapSnapshotData
       }
   if (result.type === 'validation-error') {
     throw new HeapSnapshotValidationError(result.message)
   }
-  return result.value
+  const analysisRpc = await getRpc('analysis')
+  return (await analysisRpc.invoke('HeapSnapshotAnalysis.analyze', result.value)) as ParsedHeapSnapshot
 }
 
 export const dispose = async (): Promise<void> => {
-  const { rpcPromise } = state
-  state.rpcPromise = undefined
-  if (!rpcPromise) {
-    return
-  }
-  const rpc = await rpcPromise
-  await rpc.dispose()
+  const promises = [state.parserRpcPromise, state.analysisRpcPromise]
+  state.parserRpcPromise = undefined
+  state.analysisRpcPromise = undefined
+  await Promise.all(
+    promises.map(async (promise) => {
+      if (!promise) {
+        return
+      }
+      const rpc = await promise
+      await rpc.dispose()
+    }),
+  )
 }

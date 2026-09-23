@@ -82,18 +82,18 @@ const context = {
 } as unknown as ViewContext
 
 test('reads the heap snapshot and delegates parsing to the parser worker', async () => {
-  const readFile = jest.fn(async (_uri: string) => heapSnapshot)
-  const parseHeapSnapshot = jest.fn(async (_content: string) => parsedHeapSnapshot)
+  const readFileAsBlob = jest.fn(async (_uri: string) => new Blob([heapSnapshot]))
+  const parseHeapSnapshot = jest.fn(async (_blob: Blob) => parsedHeapSnapshot)
   let time = 0
   const instance = await createInstanceWithDependencies(context, {
     getPreference: async () => false,
     now: () => time++,
     parseHeapSnapshot,
-    readFile,
+    readFileAsBlob,
   })
 
-  expect(readFile).toHaveBeenCalledWith('/workspace/test.heapsnapshot')
-  expect(parseHeapSnapshot).toHaveBeenCalledWith(heapSnapshot)
+  expect(readFileAsBlob).toHaveBeenCalledWith('/workspace/test.heapsnapshot')
+  expect(parseHeapSnapshot).toHaveBeenCalledWith(expect.any(Blob))
   const dom = instance.render()
   expect(dom.some((node) => node.text === 'Widget')).toBe(true)
   expect(dom.some((node) => node.text === 'Controller')).toBe(true)
@@ -109,7 +109,7 @@ test('filters aggregates and saves lightweight view state', async () => {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
-    readFile: async () => heapSnapshot,
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
   })
 
   await instance.handleEvent?.({
@@ -135,7 +135,7 @@ test('reads the timing preference and expands aggregate details', async () => {
     getPreference,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
-    readFile: async () => heapSnapshot,
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
   })
 
   expect(getPreference).toHaveBeenCalledWith('heapSnapshotViewer.showTimings')
@@ -158,7 +158,7 @@ test('renders validation errors returned by the parser worker', async () => {
     parseHeapSnapshot: async () => {
       throw new HeapSnapshotValidationError('The file is not valid JSON.')
     },
-    readFile: async () => 'not json',
+    readFileAsBlob: async () => new Blob(['not json']),
   })
 
   expect(instance.render().some((node) => node.text === 'The file is not valid JSON.')).toBe(true)
@@ -169,7 +169,7 @@ test('renders file system errors without describing valid data as inconsistent',
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
-    readFile: async () => {
+    readFileAsBlob: async () => {
       throw new Error('path must be a valid file uri')
     },
   })
@@ -189,7 +189,7 @@ test('moves between bounded aggregate pages and resets the page when filtering',
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => ({ ...parsedHeapSnapshot, aggregates }),
-    readFile: async () => heapSnapshot,
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
   })
 
   expect(instance.render().filter((node) => node.className === 'HeapSnapshotClassName')).toHaveLength(500)
@@ -209,7 +209,7 @@ test('component state exposes parsed data and edits the live filter', async () =
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
-    readFile: async () => heapSnapshot,
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
   })
   expect(instance.getComponentState()).toMatchObject({ summary: parsedHeapSnapshot.summary })
   instance.setComponentState({ ...instance.getComponentState(), filterValue: 'Widget' })
@@ -224,7 +224,7 @@ test('component state is available for a heap snapshot error', async () => {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
-    readFile: async () => {
+    readFileAsBlob: async () => {
       throw new Error('Missing file')
     },
   })

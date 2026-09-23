@@ -32,6 +32,10 @@ await Promise.all([
     join(root, 'packages', 'heap-snapshot-parser-worker', 'src', 'heapSnapshotParserWorkerMain.ts'),
     join(root, 'dist', 'dist', 'heapSnapshotParserWorkerMain.js'),
   ),
+  bundleJs(
+    join(root, 'packages', 'heap-snapshot-analysis-worker', 'src', 'heapSnapshotAnalysisWorkerMain.ts'),
+    join(root, 'dist', 'dist', 'heapSnapshotAnalysisWorkerMain.js'),
+  ),
   bundleJs(join(extension, 'src', 'heapSnapshotViewerMain.ts'), join(root, 'dist', 'dist', 'heapSnapshotViewerMain.js')),
 ])
 
