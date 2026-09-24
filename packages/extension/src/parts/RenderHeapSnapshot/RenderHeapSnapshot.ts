@@ -65,6 +65,13 @@ const formatBytes = (bytes: number): string => {
   return `${Number(value.toFixed(precision))} ${units[unitIndex]}`
 }
 
+const formatAverageBytes = (bytes: number): string => {
+  if (bytes < 1024) {
+    return `${Number(bytes.toFixed(2))} B`
+  }
+  return formatBytes(bytes)
+}
+
 const formatCount = (value: number): string => {
   return CountFormatter.format(value)
 }
@@ -81,7 +88,7 @@ const renderAggregateDetails = (aggregate: HeapSnapshotAggregate, summary: HeapS
   const details = [
     renderDetail('Type', aggregate.type),
     renderDetail('Instances', formatCount(aggregate.count)),
-    renderDetail('Average shallow', formatBytes(aggregate.shallowSize / aggregate.count)),
+    renderDetail('Average shallow', formatAverageBytes(aggregate.shallowSize / aggregate.count)),
     renderDetail('Retained share', `${retainedShare.toFixed(1)}%`),
   ]
   const content = node(VirtualDomElements.Div, { className: 'HeapSnapshotAggregateDetails' }, details)
