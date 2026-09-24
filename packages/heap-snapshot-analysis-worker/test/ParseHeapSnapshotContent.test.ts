@@ -33,10 +33,31 @@ test('analyzes parsed typed arrays into render-ready data', () => {
     totalShallowSize: 8,
   })
   expect(parsed.timings).toEqual([
-    { name: 'statistics', time: 1 },
     { name: 'parse', time: 1 },
+    { name: 'statistics', time: 1 },
     { name: 'aggregates', time: 1 },
   ])
+})
+
+test('groups sizes after hidden ownership transfers match constructor aggregates', () => {
+  const parsed = analyzeHeapSnapshotWithDependencies(
+    {
+      edgeFields: ['type', 'name_or_index', 'to_node'],
+      edges: new Uint32Array([2, 0, 7, 2, 0, 14]),
+      edgeTypes: ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak'],
+      nodeFields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      nodes: new Uint32Array([9, 0, 1, 0, 1, 0, 0, 3, 1, 2, 10, 1, 0, 0, 1, 2, 3, 20, 0, 0, 0]),
+      nodeTypes: ['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic'],
+      rootNodeIndex: 0,
+      snapshotSize: 456,
+      strings: ['(GC roots)', 'Widget', 'items'],
+    },
+    { id: 3, now: () => 0 },
+  )
+
+  expect(parsed.aggregates).toContainEqual({ count: 1, name: 'Widget', retainedSize: 30, shallowSize: 30, type: 'object' })
+  expect(parsed.memoryByType).toEqual([{ name: 'Objects', size: 30 }])
+  expect(parsed.summary).toEqual({ edgeCount: 2, nodeCount: 3, snapshotSize: 456, totalShallowSize: 30 })
 })
 
 test('cleans up analysis state after each snapshot', () => {

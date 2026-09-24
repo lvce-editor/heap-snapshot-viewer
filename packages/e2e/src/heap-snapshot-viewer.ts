@@ -4,7 +4,7 @@ export const name = 'heap-snapshot-viewer'
 
 const basicHeapSnapshot = JSON.stringify({
   edges: [2, 3, 7, 2, 4, 14],
-  nodes: [9, 0, 1, 0, 2, 0, 0, 3, 1, 2, 5, 0, 0, 0, 3, 2, 3, 3, 0, 0, 0],
+  nodes: [9, 0, 1, 0, 2, 0, 0, 3, 1, 2, 2300, 0, 0, 0, 3, 2, 3, 1500, 0, 0, 0],
   snapshot: {
     meta: {
       edge_fields: ['type', 'name_or_index', 'to_node'],
@@ -61,9 +61,12 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   const snapshotMetadataLabel = metadataLabels.nth(0)
   const nodeMetadataLabel = metadataLabels.nth(1)
   const edgeMetadataLabel = metadataLabels.nth(2)
-  await expect(snapshotMetadataLabel).toHaveText('Snapshot')
+  await expect(snapshotMetadataLabel).toHaveText('Heap size')
   await expect(nodeMetadataLabel).toHaveText('Nodes')
   await expect(edgeMetadataLabel).toHaveText('Edges')
+  const metadataValues = Locator('.HeapSnapshotMetadataValue')
+  const heapSize = metadataValues.nth(0)
+  await expect(heapSize).toHaveText('3.8 kB')
   const memoryTypes = Locator('.HeapSnapshotMemoryTypeName')
   await expect(memoryTypes).toHaveCount(1)
   await expect(memoryTypes).toHaveText('Objects')
@@ -79,8 +82,8 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   await expect(numericCells).toHaveCount(4)
   const firstShallowSize = numericCells.nth(0)
   const firstRetainedSize = numericCells.nth(1)
-  await expect(firstShallowSize).toHaveText('5 B')
-  await expect(firstRetainedSize).toHaveText('5 B')
+  await expect(firstShallowSize).toHaveText('2.3 kB')
+  await expect(firstRetainedSize).toHaveText('2.3 kB')
 
   const disclosure = Locator('.HeapSnapshotDisclosure').nth(0)
   await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
@@ -110,7 +113,7 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   const constructorTable = Locator('.HeapSnapshotTable')
   await expect(statistics).toBeVisible()
   await expect(donut).toBeVisible()
-  await expect(donutTotal).toHaveText('8 B')
+  await expect(donutTotal).toHaveText('3.8 kB')
   await expect(donutName).toHaveText('Objects')
   await expect(constructorTable).toHaveCount(0)
 
