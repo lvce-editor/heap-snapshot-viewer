@@ -67,7 +67,9 @@ test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () =
     type: VirtualDomElements.Input,
     value: 'wid',
   })
-  expect(dom.some((node) => node.text === '1.5 KB')).toBe(true)
+  expect(dom.some((node) => node.text === '64 B')).toBe(true)
+  expect(dom.some((node) => node.text === '0.1 kB')).toBe(true)
+  expect(dom.some((node) => node.text === '1.5 kB')).toBe(false)
   expect(dom.some((node) => node.text === 'Objects')).toBe(true)
   expect(dom.some((node) => node.text === 'Shallow size')).toBe(true)
   expect(dom.some((node) => node.text === 'Retained size')).toBe(true)
@@ -194,6 +196,20 @@ test.each([
   })
 
   expect(dom.some((node) => node.text === expected)).toBe(true)
+})
+
+test.each([
+  [5, '0.0 kB'],
+  [99_500, '99.5 kB'],
+  [100_000, '100 kB'],
+  [1_770_000, '1,770 kB'],
+])('formats constructor size %i as %s', (size, expected) => {
+  const dom = render({
+    ...state,
+    aggregates: [{ ...state.aggregates[0], retainedSize: size, shallowSize: size }],
+  })
+
+  expect(dom.filter((node) => node.text === expected)).toHaveLength(2)
 })
 
 test('bounds the number of rendered aggregate rows', () => {

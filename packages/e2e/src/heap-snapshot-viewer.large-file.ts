@@ -30,11 +30,11 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   await Main.openUri(uri)
 
   const metadataValues = Locator('.HeapSnapshotMetadataValue')
-  const snapshotSize = metadataValues.nth(0)
+  const heapSize = metadataValues.nth(0)
   const nodeCount = metadataValues.nth(1)
   const aggregateCount = Locator('.HeapSnapshotCountLabel')
   const errorMessage = Locator('.HeapSnapshotErrorMessage')
-  await expect(snapshotSize).toContainText('MB')
+  await expect(heapSize).toHaveText('2.0 kB')
   await expect(nodeCount).toHaveText('2,001')
   await expect(aggregateCount).toHaveText('× 2,000')
   await expect(errorMessage).toHaveCount(0)

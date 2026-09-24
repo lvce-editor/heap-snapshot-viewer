@@ -59,9 +59,9 @@ export const analyzeHeapSnapshotWithDependencies = (
   const timings: HeapSnapshotTiming[] = []
   HeapSnapshotState.add(id, parsed)
   try {
+    measure('parse', () => ParseHeapSnapshot.parseHeapSnapshot(id), dependencies.now, timings)
     const statistics = measure('statistics', () => GetStatistics.getStatistics(id), dependencies.now, timings)
     const snapshotSummary = GetSnapshotSummary.getSnapshotSummary(id)
-    measure('parse', () => ParseHeapSnapshot.parseHeapSnapshot(id), dependencies.now, timings)
     const aggregates = measure(
       'aggregates',
       () => GetAggregatesByClassName.getAggregratesByClassName(id),

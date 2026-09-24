@@ -9,6 +9,7 @@ interface TreeNode {
 
 const ToggleAggregatePrefix = 'toggle-aggregate:'
 const CountFormatter = new Intl.NumberFormat('en-US')
+const DecimalByteFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 1 })
 const AggregatePageSize = 500
 const MemoryColors = ['#33b1d4', '#c678dd', '#44b95c', '#8d78e8', '#f1c232', '#6f9df3', '#ef765f', '#45c6a5']
 const MemoryColorIndexes: Readonly<Record<string, number>> = {
@@ -46,23 +47,27 @@ const span = (className: string, value: string, properties: Readonly<Record<stri
 }
 
 const formatBytes = (bytes: number): string => {
-  if (bytes < 1024) {
+  if (bytes < 1000) {
     return `${bytes} B`
   }
-  const units = ['KB', 'MB', 'GB', 'TB']
-  let value = bytes / 1024
-  let unitIndex = 0
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024
-    unitIndex++
+  const kilobytes = bytes / 1000
+  if (kilobytes < 100) {
+    return `${DecimalByteFormatter.format(kilobytes)} kB`
   }
-  let precision = 2
-  if (value >= 100) {
-    precision = 0
-  } else if (value >= 10) {
-    precision = 1
+  if (kilobytes < 1000) {
+    return `${CountFormatter.format(Math.round(kilobytes))} kB`
   }
-  return `${Number(value.toFixed(precision))} ${units[unitIndex]}`
+  const megabytes = kilobytes / 1000
+  const formatted = megabytes < 100 ? DecimalByteFormatter.format(megabytes) : CountFormatter.format(Math.round(megabytes))
+  return `${formatted} MB`
+}
+
+const formatBytesToKilobytes = (bytes: number): string => {
+  const kilobytes = bytes / 1000
+  if (kilobytes < 100) {
+    return `${DecimalByteFormatter.format(kilobytes)} kB`
+  }
+  return `${CountFormatter.format(Math.round(kilobytes))} kB`
 }
 
 const formatAverageBytes = (bytes: number): string => {
@@ -116,10 +121,10 @@ const renderAggregate = (
     span('HeapSnapshotCountLabel', `× ${formatCount(aggregate.count)}`),
   ])
   const shallowSizeCell = node(VirtualDomElements.Td, { className: 'HeapSnapshotTableCell HeapSnapshotNumericCell' }, [
-    textNode(formatBytes(aggregate.shallowSize)),
+    textNode(formatBytesToKilobytes(aggregate.shallowSize)),
   ])
   const retainedSizeCell = node(VirtualDomElements.Td, { className: 'HeapSnapshotTableCell HeapSnapshotNumericCell' }, [
-    textNode(formatBytes(aggregate.retainedSize)),
+    textNode(formatBytesToKilobytes(aggregate.retainedSize)),
   ])
   const rowClassName = isExpanded ? 'HeapSnapshotTableBodyRow HeapSnapshotTableBodyRowExpanded' : 'HeapSnapshotTableBodyRow'
   const row = node(VirtualDomElements.Tr, { className: rowClassName }, [constructorCell, shallowSizeCell, retainedSizeCell])
@@ -214,7 +219,7 @@ const renderFilter = (value: string, summary: HeapSnapshotSummary): TreeNode => 
   })
   const inputWrapper = node(VirtualDomElements.Div, { className: 'HeapSnapshotFilterInputWrapper' }, [input])
   const metadata = node(VirtualDomElements.Div, { className: 'HeapSnapshotMetadata' }, [
-    renderMetadataItem('Snapshot', formatBytes(summary.snapshotSize)),
+    renderMetadataItem('Heap size', formatBytes(summary.totalShallowSize)),
     renderMetadataItem('Nodes', formatCount(summary.nodeCount)),
     renderMetadataItem('Edges', formatCount(summary.edgeCount)),
   ])
