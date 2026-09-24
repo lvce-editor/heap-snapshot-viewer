@@ -124,9 +124,28 @@ test('filters aggregates and saves lightweight view state', async () => {
   expect(instance.saveState()).toEqual({
     filterValue: 'widget',
     uri: '/workspace/test.heapsnapshot',
+    view: 'constructors',
   })
 
   instance.dispose?.()
+})
+
+test('switches to statistics and back without reparsing, and saves the selected view', async () => {
+  const parseHeapSnapshot = jest.fn(async () => parsedHeapSnapshot)
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot,
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
+  })
+
+  await instance.handleEvent?.({ name: 'view:statistics', type: 'click' })
+  expect(instance.render().some((node) => node.className === 'HeapSnapshotDonut')).toBe(true)
+  expect(instance.render().some((node) => node.className === 'HeapSnapshotTable')).toBe(false)
+  await instance.handleEvent?.({ name: 'view:constructors', type: 'click' })
+  expect(instance.render().some((node) => node.className === 'HeapSnapshotTable')).toBe(true)
+  expect(parseHeapSnapshot).toHaveBeenCalledTimes(1)
+  expect(instance.saveState()).toMatchObject({ view: 'constructors' })
 })
 
 test('reads the timing preference and expands aggregate details', async () => {

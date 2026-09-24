@@ -34,6 +34,7 @@ const state = {
       time: 1.25,
     },
   ],
+  view: 'constructors' as const,
 }
 
 test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () => {
@@ -76,6 +77,21 @@ test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () =
   expect(classNames.every((className) => className.startsWith('HeapSnapshot'))).toBe(true)
   expect(classNames).toContain('HeapSnapshotTable')
   expect(dom).toContainEqual({
+    ariaLabel: 'Heap snapshot view',
+    childCount: 2,
+    className: 'HeapSnapshotViewSelector',
+    role: 'group',
+    type: VirtualDomElements.Div,
+  })
+  expect(dom).toContainEqual({
+    ariaPressed: 'false',
+    childCount: 1,
+    className: 'HeapSnapshotViewTab',
+    name: 'view:statistics',
+    onClick: 'handleClick',
+    type: VirtualDomElements.Button,
+  })
+  expect(dom).toContainEqual({
     childCount: 3,
     className: 'HeapSnapshotTableColumnGroup',
     type: VirtualDomElements.ColGroup,
@@ -97,6 +113,40 @@ test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () =
       type: VirtualDomElements.Col,
     },
   ])
+})
+
+test('renders a proportional donut, total, and legend in the statistics view', () => {
+  const dom = render({
+    ...state,
+    memoryByType: [
+      { name: 'Objects', size: 48 },
+      { name: 'Strings', size: 16 },
+    ],
+    summary: { ...state.summary, totalShallowSize: 64 },
+    view: 'statistics',
+  })
+
+  expect(dom.some((node) => node.className === 'HeapSnapshotStatistics')).toBe(true)
+  expect(dom.some((node) => node.className === 'HeapSnapshotDonut')).toBe(true)
+  expect(dom.some((node) => typeof node.style === 'string' && node.style.includes('conic-gradient'))).toBe(true)
+  expect(dom.some((node) => node.text === 'Objects')).toBe(true)
+  expect(dom.some((node) => node.text === 'Strings')).toBe(true)
+  expect(dom.some((node) => node.text === '64 B')).toBe(true)
+  expect(dom.some((node) => node.className === 'HeapSnapshotTable')).toBe(false)
+})
+
+test('renders an empty statistics donut without invalid geometry', () => {
+  const dom = render({
+    ...state,
+    memoryByType: [],
+    summary: { ...state.summary, totalShallowSize: 0 },
+    view: 'statistics',
+  })
+
+  const chart = dom.find((node) => node.className === 'HeapSnapshotDonut')
+  expect(chart?.style).not.toContain('NaN')
+  expect(chart?.style).not.toContain('Infinity')
+  expect(dom.some((node) => node.text === '0 B')).toBe(true)
 })
 
 test('shows processing timings only when enabled', () => {

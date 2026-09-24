@@ -64,7 +64,7 @@
   line-height: 1.5;
 }
 
-.HeapSnapshotHeader {
+.HeapSnapshotToolbar {
   position: sticky;
   top: 0;
   z-index: 2;
@@ -77,6 +77,44 @@
   padding: 12px 20px;
   border-bottom: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.25));
   background: var(--EditorBackground, #1f1f1f);
+}
+
+.HeapSnapshotViewSelector {
+  display: flex;
+  flex: 0 0 auto;
+  padding: 2px;
+  color: var(--InputForeground, inherit);
+  border: 1px solid var(--InputBorder, rgba(128, 128, 128, 0.35));
+  border-radius: 3px;
+  background: var(--InputBackground, rgba(128, 128, 128, 0.12));
+}
+
+.HeapSnapshotViewTab {
+  padding: 5px 10px;
+  color: var(--InputForeground, inherit);
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.HeapSnapshotViewTabSelected {
+  color: var(--EditorForeground, #cccccc);
+  background: var(--ListHoverBackground, rgba(128, 128, 128, 0.2));
+}
+
+.HeapSnapshotViewTab:focus-visible {
+  outline: 1px solid var(--FocusBorder, #007fd4);
+  outline-offset: 1px;
+}
+
+.HeapSnapshotConstructorToolbar {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 .HeapSnapshotFilterInputWrapper {
@@ -135,12 +173,104 @@
 }
 
 .HeapSnapshotMemorySection,
+.HeapSnapshotStatistics,
 .HeapSnapshotTimingsSection {
   margin: 16px 20px 0;
   padding: 16px;
   border: 1px solid var(--PanelBorder, rgba(128, 128, 128, 0.25));
   border-radius: 5px;
   background: var(--SideBarBackground, rgba(128, 128, 128, 0.035));
+}
+
+.HeapSnapshotStatisticsContent {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  margin-top: 20px;
+}
+
+.HeapSnapshotDonut {
+  display: grid;
+  width: 220px;
+  height: 220px;
+  flex: 0 0 220px;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.HeapSnapshotDonutCenter {
+  display: flex;
+  width: 132px;
+  height: 132px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 50%;
+  background: var(--EditorBackground, #1f1f1f);
+  text-align: center;
+}
+
+.HeapSnapshotDonutTotal {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.HeapSnapshotDonutTotalLabel {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.65));
+  font-size: 11px;
+}
+
+.HeapSnapshotDonutLegend {
+  display: grid;
+  min-width: 250px;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.HeapSnapshotDonutLegendItem {
+  display: grid;
+  grid-template-columns: 12px minmax(120px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.HeapSnapshotDonutSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.HeapSnapshotDonutName {
+  color: var(--EditorForeground, #cccccc);
+}
+
+.HeapSnapshotDonutSize {
+  color: var(--DescriptionForeground, rgba(204, 204, 204, 0.75));
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .HeapSnapshotToolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .HeapSnapshotConstructorToolbar {
+    align-items: stretch;
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+
+  .HeapSnapshotStatisticsContent {
+    align-items: center;
+    flex-direction: column;
+  }
 }
 
 .HeapSnapshotSectionHeader {
