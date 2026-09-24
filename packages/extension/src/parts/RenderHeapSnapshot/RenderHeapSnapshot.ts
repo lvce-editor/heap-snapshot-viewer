@@ -10,6 +10,14 @@ interface TreeNode {
 const ToggleAggregatePrefix = 'toggle-aggregate:'
 const CountFormatter = new Intl.NumberFormat('en-US')
 const AggregatePageSize = 500
+const MemoryColors = ['#33b1d4', '#c678dd', '#44b95c', '#8d78e8', '#f1c232', '#6f9df3', '#ef765f', '#45c6a5']
+const MemoryColorIndexes: Readonly<Record<string, number>> = {
+  Arrays: 2,
+  Code: 0,
+  Objects: 5,
+  Strings: 1,
+  System: 4,
+}
 
 const textNode = (value: string): TreeNode => ({
   children: [],
@@ -203,7 +211,83 @@ const renderFilter = (value: string, summary: HeapSnapshotSummary): TreeNode => 
     renderMetadataItem('Nodes', formatCount(summary.nodeCount)),
     renderMetadataItem('Edges', formatCount(summary.edgeCount)),
   ])
-  return node(VirtualDomElements.Header, { className: 'HeapSnapshotHeader' }, [inputWrapper, metadata])
+  return node(VirtualDomElements.Div, { className: 'HeapSnapshotConstructorToolbar' }, [inputWrapper, metadata])
+}
+
+const renderViewSelector = (view: HeapSnapshotViewState['view']): TreeNode => {
+  const constructors = node(
+    VirtualDomElements.Button,
+    {
+      ariaPressed: view === 'constructors' ? 'true' : 'false',
+      className: view === 'constructors' ? 'HeapSnapshotViewTab HeapSnapshotViewTabSelected' : 'HeapSnapshotViewTab',
+      name: 'view:constructors',
+      onClick: 'handleClick',
+    },
+    [textNode('Constructors')],
+  )
+  const statistics = node(
+    VirtualDomElements.Button,
+    {
+      ariaPressed: view === 'statistics' ? 'true' : 'false',
+      className: view === 'statistics' ? 'HeapSnapshotViewTab HeapSnapshotViewTabSelected' : 'HeapSnapshotViewTab',
+      name: 'view:statistics',
+      onClick: 'handleClick',
+    },
+    [textNode('Statistics')],
+  )
+  return node(VirtualDomElements.Div, { ariaLabel: 'Heap snapshot view', className: 'HeapSnapshotViewSelector', role: 'group' }, [
+    constructors,
+    statistics,
+  ])
+}
+
+const getMemoryColor = (name: string): string => {
+  const index = MemoryColorIndexes[name] ?? [...name].reduce((total, character) => total + character.codePointAt(0)!, 0)
+  return MemoryColors[index % MemoryColors.length]
+}
+
+const renderMemoryLegendItem = (memoryType: HeapSnapshotMemoryType): TreeNode => {
+  const color = getMemoryColor(memoryType.name)
+  return node(VirtualDomElements.Li, { className: 'HeapSnapshotDonutLegendItem' }, [
+    node(VirtualDomElements.Span, { 'aria-hidden': 'true', className: 'HeapSnapshotDonutSwatch', style: `background: ${color}` }),
+    span('HeapSnapshotDonutName', memoryType.name),
+    span('HeapSnapshotDonutSize', formatBytes(memoryType.size)),
+  ])
+}
+
+const getDonutStyle = (memoryByType: readonly HeapSnapshotMemoryType[], totalSize: number): string => {
+  if (totalSize === 0) {
+    return 'background: var(--ProgressBarBackground, rgba(128, 128, 128, 0.2))'
+  }
+  let current = 0
+  const segments = memoryByType.map((memoryType) => {
+    const start = current
+    current += (memoryType.size / totalSize) * 360
+    const color = getMemoryColor(memoryType.name)
+    return `${color} ${start}deg ${current}deg`
+  })
+  return `background: conic-gradient(${segments.join(', ')})`
+}
+
+const renderStatistics = (memoryByType: readonly HeapSnapshotMemoryType[], summary: HeapSnapshotSummary): TreeNode => {
+  const total = span('HeapSnapshotDonutTotal', formatBytes(summary.totalShallowSize))
+  const totalLabel = span('HeapSnapshotDonutTotalLabel', 'Total shallow size')
+  const center = node(VirtualDomElements.Div, { className: 'HeapSnapshotDonutCenter' }, [total, totalLabel])
+  const chart = node(
+    VirtualDomElements.Div,
+    {
+      ariaLabel: `Shallow heap size ${formatBytes(summary.totalShallowSize)}`,
+      className: 'HeapSnapshotDonut',
+      role: 'img',
+      style: getDonutStyle(memoryByType, summary.totalShallowSize),
+    },
+    [center],
+  )
+  const legend = node(VirtualDomElements.Ul, { className: 'HeapSnapshotDonutLegend' }, memoryByType.map(renderMemoryLegendItem))
+  return node(VirtualDomElements.Section, { ariaLabel: 'Heap snapshot statistics', className: 'HeapSnapshotStatistics' }, [
+    node(VirtualDomElements.H2, { className: 'HeapSnapshotSectionTitle' }, [textNode('Statistics')]),
+    node(VirtualDomElements.Div, { className: 'HeapSnapshotStatisticsContent' }, [chart, legend]),
+  ])
 }
 
 const renderMemoryType = (memoryType: HeapSnapshotMemoryType, totalSize: number): TreeNode => {
@@ -253,13 +337,21 @@ const renderTimings = (timings: HeapSnapshotViewState['timings']): TreeNode => {
 }
 
 export const render = (state: Readonly<HeapSnapshotViewState>): readonly VirtualDomNode[] => {
-  const pagination = renderPagination(state.aggregatePage, state.aggregates.length)
+  const pagination = state.view === 'constructors' ? renderPagination(state.aggregatePage, state.aggregates.length) : undefined
+  const header = node(VirtualDomElements.Header, { className: 'HeapSnapshotToolbar' }, [
+    renderViewSelector(state.view),
+    ...(state.view === 'constructors' ? [renderFilter(state.filterValue, state.summary)] : []),
+  ])
   const children = [
-    renderFilter(state.filterValue, state.summary),
-    renderMemoryByType(state.memoryByType, state.summary),
+    header,
+    ...(state.view === 'statistics'
+      ? [renderStatistics(state.memoryByType, state.summary)]
+      : [renderMemoryByType(state.memoryByType, state.summary)]),
     ...(state.showTimings ? [renderTimings(state.timings)] : []),
     ...(pagination ? [pagination] : []),
-    renderTable(state.aggregates, state.aggregatePage, state.expandedNames, state.summary),
+    ...(state.view === 'constructors'
+      ? [renderTable(state.aggregates, state.aggregatePage, state.expandedNames, state.summary)]
+      : []),
   ]
   const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView' }, children)
   return flatten(root)

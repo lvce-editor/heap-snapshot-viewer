@@ -27,6 +27,7 @@ export interface HeapSnapshotViewState {
   readonly showTimings: boolean
   readonly summary: HeapSnapshotSummary
   readonly timings: readonly HeapSnapshotTiming[]
+  readonly view: 'constructors' | 'statistics'
 }
 
 export type HeapSnapshotComponentState = HeapSnapshotViewState | { readonly errorMessage: string }
@@ -38,6 +39,7 @@ interface HeapSnapshotViewContext extends ViewContext {
 interface HeapSnapshotSavedState {
   readonly filterValue?: unknown
   readonly uri?: unknown
+  readonly view?: unknown
 }
 
 export interface HeapSnapshotViewInstance extends VirtualDomViewInstance {
@@ -86,6 +88,10 @@ const getUri = (context: HeapSnapshotViewContext | undefined, savedState: HeapSn
 
 const getFilterValue = (savedState: HeapSnapshotSavedState): string => {
   return typeof savedState.filterValue === 'string' ? savedState.filterValue : ''
+}
+
+const getView = (savedState: HeapSnapshotSavedState): HeapSnapshotViewState['view'] => {
+  return savedState.view === 'statistics' ? 'statistics' : 'constructors'
 }
 
 const measure = async <T>(
@@ -147,6 +153,7 @@ export const createInstanceWithDependencies = async (
       showTimings,
       summary: parsed.summary,
       timings: [...timings, ...parsed.timings],
+      view: getView(savedState),
     }
 
     return {
@@ -155,6 +162,13 @@ export const createInstanceWithDependencies = async (
         return state
       },
       handleEvent(event: Readonly<ViewEvent>): void {
+        if (event.type === 'click' && (event.name === 'view:constructors' || event.name === 'view:statistics')) {
+          state = {
+            ...state,
+            view: event.name === 'view:statistics' ? 'statistics' : 'constructors',
+          }
+          return
+        }
         if (event.type === 'click' && event.name === 'previous-page') {
           state = {
             ...state,
@@ -200,6 +214,7 @@ export const createInstanceWithDependencies = async (
         return {
           filterValue: state.filterValue,
           uri,
+          view: state.view,
         }
       },
       setComponentState(newState: HeapSnapshotComponentState): void {

@@ -46,6 +46,8 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   const table = Locator('.HeapSnapshotTable')
   await expect(table).toBeVisible()
   await expect(table).toHaveCSS('table-layout', 'fixed')
+  const viewSelector = Locator('.HeapSnapshotViewSelector')
+  await expect(viewSelector).toBeVisible()
   const columns = Locator('.HeapSnapshotTable > colgroup > col')
   await expect(columns).toHaveCount(3)
   const constructorColumn = columns.nth(0)
@@ -97,4 +99,24 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   const filteredConstructors = Locator('.HeapSnapshotClassName')
   await expect(filteredConstructors).toHaveCount(1)
   await expect(filteredConstructors).toHaveText('Controller')
+
+  const statisticsTab = Locator('.HeapSnapshotViewTab').nth(1)
+  // eslint-disable-next-line e2e/no-direct-click -- The view selector is extension-local and has no shared page object.
+  await statisticsTab.click()
+  const statistics = Locator('.HeapSnapshotStatistics')
+  const donut = Locator('.HeapSnapshotDonut')
+  const donutTotal = Locator('.HeapSnapshotDonutTotal')
+  const donutName = Locator('.HeapSnapshotDonutName')
+  const constructorTable = Locator('.HeapSnapshotTable')
+  await expect(statistics).toBeVisible()
+  await expect(donut).toBeVisible()
+  await expect(donutTotal).toHaveText('8 B')
+  await expect(donutName).toHaveText('Objects')
+  await expect(constructorTable).toHaveCount(0)
+
+  const constructorsTab = Locator('.HeapSnapshotViewTab').nth(0)
+  // eslint-disable-next-line e2e/no-direct-click -- The view selector is extension-local and has no shared page object.
+  await constructorsTab.click()
+  await expect(constructorTable).toBeVisible()
+  await expect(filteredConstructors).toHaveCount(1)
 }
