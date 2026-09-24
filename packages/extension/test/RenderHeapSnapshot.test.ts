@@ -181,6 +181,21 @@ test('renders expanded aggregate details and an expanded disclosure', () => {
   expect(dom.some((node) => node.text === '32 B')).toBe(true)
 })
 
+test.each([
+  [826, 27, '30.59 B'],
+  [15_308, 500, '30.62 B'],
+  [123, 4, '30.75 B'],
+  [128, 4, '32 B'],
+])('formats average shallow size %i / %i as %s', (shallowSize, count, expected) => {
+  const dom = render({
+    ...state,
+    aggregates: [{ ...state.aggregates[0], count, shallowSize }],
+    expandedNames: ['Widget'],
+  })
+
+  expect(dom.some((node) => node.text === expected)).toBe(true)
+})
+
 test('bounds the number of rendered aggregate rows', () => {
   const aggregates = Array.from({ length: 10_000 }, (_, index) => ({
     count: 1,
