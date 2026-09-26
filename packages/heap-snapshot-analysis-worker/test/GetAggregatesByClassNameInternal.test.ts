@@ -85,3 +85,31 @@ test('does not double count retained size for nested instances of the same class
     },
   ])
 })
+
+test('aggregates object names that shadow object prototype properties', () => {
+  const nodes = new Uint32Array(
+    [
+      [9, 0, 0, 0, 1, 0, 0],
+      [3, 1, 0, 10, 1, 0, 0],
+      [3, 1, 0, 5, 0, 0, 0],
+    ].flat(),
+  )
+  expect(
+    GetAggregatesByClassNameInternal.getAggregratesByClassNameInternal(
+      nodes,
+      nodeFields,
+      nodeTypes,
+      ['(GC roots)', '__proto__'],
+      new Float64Array([15, 15, 5]),
+      new Uint32Array([0, 0, 1]),
+    ),
+  ).toEqual([
+    {
+      count: 2,
+      name: '__proto__',
+      retainedSize: 15,
+      shallowSize: 15,
+      type: 'object',
+    },
+  ])
+})

@@ -40,7 +40,7 @@ export const getStatisicsInternal = (
   const nodeFieldCount = nodeFields.length
   const selfSizeOffset = nodeFields.indexOf(NodeFieldType.SelfSize)
   const nodeTypeOffset = nodeFields.indexOf(NodeFieldType.Type)
-  const sizeMap = new Map<string, number>()
+  const sizeMap: Record<string, number> = Object.create(null)
   let totalShallowSize = 0
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += nodeFieldCount) {
     const shallowSize = nodes[nodeIndex + selfSizeOffset]
@@ -48,10 +48,10 @@ export const getStatisicsInternal = (
       continue
     }
     const name = getMemoryTypeName(nodeTypes[nodes[nodeIndex + nodeTypeOffset]])
-    sizeMap.set(name, (sizeMap.get(name) || 0) + shallowSize)
+    sizeMap[name] = (sizeMap[name] || 0) + shallowSize
     totalShallowSize += shallowSize
   }
-  const memoryByType = Array.from(sizeMap, ([name, size]) => ({ name, size })).sort(
+  const memoryByType = Object.entries(sizeMap).map(([name, size]) => ({ name, size })).sort(
     (a, b) => b.size - a.size || a.name.localeCompare(b.name),
   )
   return { memoryByType, totalShallowSize }
