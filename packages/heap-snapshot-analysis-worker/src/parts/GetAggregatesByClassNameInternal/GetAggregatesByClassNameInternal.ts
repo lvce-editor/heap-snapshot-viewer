@@ -113,8 +113,8 @@ export const getAggregratesByClassNameInternal = (
   const nodeNameOffset = nodeFields.indexOf(NodeFieldType.Name)
   const nodeCount = nodes.length / nodeFieldCount
   const classIds = new Uint32Array(nodeCount)
-  const classIdMap = new Map<string, number>()
-  const aggregateMap = new Map<string, MutableAggregate>()
+  const classIdMap: Record<string, number> = Object.create(null)
+  const aggregateMap: Record<string, MutableAggregate> = Object.create(null)
   const aggregates: MutableAggregate[] = []
 
   for (let nodeOrdinal = 0; nodeOrdinal < nodeCount; nodeOrdinal++) {
@@ -126,7 +126,7 @@ export const getAggregratesByClassNameInternal = (
     const nodeTypeString = nodeTypes[nodes[nodeIndex + nodeTypeOffset]]
     const nodeNameString = strings[nodes[nodeIndex + nodeNameOffset]]
     const name = GetNodeClassName.getNodeClassName(nodeTypeString, nodeNameString)
-    let aggregate = aggregateMap.get(name)
+    let aggregate = aggregateMap[name]
     if (!aggregate) {
       aggregate = {
         count: 0,
@@ -135,13 +135,13 @@ export const getAggregratesByClassNameInternal = (
         shallowSize: 0,
         type: nodeTypeString,
       }
-      aggregateMap.set(name, aggregate)
+      aggregateMap[name] = aggregate
       aggregates.push(aggregate)
-      classIdMap.set(name, aggregates.length)
+      classIdMap[name] = aggregates.length
     }
     aggregate.count++
     aggregate.shallowSize += shallowSize
-    classIds[nodeOrdinal] = classIdMap.get(name) as number
+    classIds[nodeOrdinal] = classIdMap[name]
   }
 
   calculateAggregateRetainedSizes(aggregates, classIds, dominatorsTree, retainedSizes)
