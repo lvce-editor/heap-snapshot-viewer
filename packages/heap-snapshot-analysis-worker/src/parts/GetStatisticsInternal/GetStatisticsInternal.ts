@@ -51,8 +51,8 @@ export const getStatisicsInternal = (
     sizeMap[name] = (sizeMap[name] || 0) + shallowSize
     totalShallowSize += shallowSize
   }
-  const memoryByType = Object.entries(sizeMap).map(([name, size]) => ({ name, size })).sort(
-    (a, b) => b.size - a.size || a.name.localeCompare(b.name),
-  )
+  const memoryByType = Object.entries(sizeMap)
+    .map(([name, size]) => ({ name, size }))
+    .sort((a, b) => b.size - a.size || a.name.localeCompare(b.name))
   return { memoryByType, totalShallowSize }
 }

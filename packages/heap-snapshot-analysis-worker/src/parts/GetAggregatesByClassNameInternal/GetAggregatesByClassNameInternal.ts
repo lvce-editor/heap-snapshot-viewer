@@ -141,7 +141,7 @@ export const getAggregratesByClassNameInternal = (
     }
     aggregate.count++
     aggregate.shallowSize += shallowSize
-    classIds[nodeOrdinal] = classIdMap[name] as number
+    classIds[nodeOrdinal] = classIdMap[name]
   }
 
   calculateAggregateRetainedSizes(aggregates, classIds, dominatorsTree, retainedSizes)
