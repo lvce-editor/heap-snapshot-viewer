@@ -190,11 +190,12 @@
 }
 
 .HeapSnapshotDonut {
-  display: grid;
+  display: flex;
   width: 220px;
   height: 220px;
   flex: 0 0 220px;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
 }
 
@@ -223,8 +224,9 @@
 }
 
 .HeapSnapshotDonutLegend {
-  display: grid;
+  display: flex;
   min-width: 250px;
+  flex-direction: column;
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -232,23 +234,29 @@
 }
 
 .HeapSnapshotDonutLegendItem {
-  display: grid;
-  grid-template-columns: 12px minmax(120px, 1fr) auto;
+  display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .HeapSnapshotDonutSwatch {
+  flex: 0 0 12px;
   width: 10px;
   height: 10px;
   border-radius: 2px;
 }
 
 .HeapSnapshotDonutName {
+  min-width: 0;
+  flex: 1 1 120px;
+  overflow: hidden;
   color: var(--EditorForeground, #cccccc);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .HeapSnapshotDonutSize {
+  flex: 0 0 auto;
   color: var(--DescriptionForeground, rgba(204, 204, 204, 0.75));
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -270,6 +278,11 @@
   .HeapSnapshotStatisticsContent {
     align-items: center;
     flex-direction: column;
+  }
+
+  .HeapSnapshotDonutLegend {
+    width: 100%;
+    min-width: 0;
   }
 }
 
@@ -295,12 +308,13 @@
 }
 
 .HeapSnapshotMemoryList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 14px 24px;
 }
 
 .HeapSnapshotMemoryType {
+  flex: 1 1 180px;
   min-width: 0;
 }
 
@@ -342,8 +356,8 @@
 }
 
 .HeapSnapshotTimings {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px 20px;
   margin: 12px 0 0;
   padding: 0;
@@ -352,6 +366,8 @@
 
 .HeapSnapshotTiming {
   display: flex;
+  flex: 1 1 150px;
+  min-width: 0;
   justify-content: space-between;
   gap: 12px;
 }
@@ -533,8 +549,8 @@
 }
 
 .HeapSnapshotAggregateDetails {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 12px 12px 14px 40px;
   background: var(--EditorWidgetBackground, rgba(128, 128, 128, 0.055));
@@ -542,6 +558,7 @@
 
 .HeapSnapshotAggregateDetail {
   display: flex;
+  flex: 1 1 120px;
   min-width: 0;
   flex-direction: column;
   gap: 3px;
@@ -582,7 +599,12 @@
   }
 
   .HeapSnapshotAggregateDetails {
-    grid-template-columns: repeat(2, minmax(100px, 1fr));
+    gap: 16px;
+  }
+
+  .HeapSnapshotAggregateDetail {
+    flex-basis: calc((100% - 16px) / 2);
+    min-width: 100px;
   }
 
   .HeapSnapshotTableColumnConstructor {
