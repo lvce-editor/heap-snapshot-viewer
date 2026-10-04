@@ -81,11 +81,20 @@ const context = {
   viewId: 'builtin.heap-snapshot-viewer',
 } as unknown as ViewContext
 
+const createLoadedInstance = async (
+  instanceContext: ViewContext | undefined,
+  dependencies: Parameters<typeof createInstanceWithDependencies>[1],
+) => {
+  const instance = await createInstanceWithDependencies(instanceContext, dependencies)
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  return instance
+}
+
 test('reads the heap snapshot and delegates parsing to the parser worker', async () => {
   const readFileAsBlob = jest.fn(async (_uri: string) => new Blob([heapSnapshot]))
   const parseHeapSnapshot = jest.fn(async (_blob: Blob) => parsedHeapSnapshot)
   let time = 0
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => time++,
     parseHeapSnapshot,
@@ -105,7 +114,7 @@ test('reads the heap snapshot and delegates parsing to the parser worker', async
 })
 
 test('filters aggregates and saves lightweight view state', async () => {
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
@@ -132,7 +141,7 @@ test('filters aggregates and saves lightweight view state', async () => {
 
 test('switches to statistics and back without reparsing, and saves the selected view', async () => {
   const parseHeapSnapshot = jest.fn(async () => parsedHeapSnapshot)
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot,
@@ -150,7 +159,7 @@ test('switches to statistics and back without reparsing, and saves the selected 
 
 test('reads the timing preference and expands aggregate details', async () => {
   const getPreference = jest.fn(async (_key: string) => true)
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
@@ -171,7 +180,7 @@ test('reads the timing preference and expands aggregate details', async () => {
 })
 
 test('renders validation errors returned by the parser worker', async () => {
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => {
@@ -184,7 +193,7 @@ test('renders validation errors returned by the parser worker', async () => {
 })
 
 test('renders file system errors without describing valid data as inconsistent', async () => {
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
@@ -204,7 +213,7 @@ test('moves between bounded aggregate pages and resets the page when filtering',
     shallowSize: 1,
     type: 'object',
   }))
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => ({ ...parsedHeapSnapshot, aggregates }),
@@ -224,7 +233,7 @@ test('moves between bounded aggregate pages and resets the page when filtering',
 })
 
 test('component state exposes parsed data and edits the live filter', async () => {
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
@@ -239,7 +248,7 @@ test('component state exposes parsed data and edits the live filter', async () =
 })
 
 test('component state is available for a heap snapshot error', async () => {
-  const instance = await createInstanceWithDependencies(context, {
+  const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
     now: () => 0,
     parseHeapSnapshot: async () => parsedHeapSnapshot,
@@ -250,4 +259,57 @@ test('component state is available for a heap snapshot error', async () => {
   expect(instance.getComponentState()).toEqual({ errorMessage: 'Missing file' })
   instance.setComponentState({ errorMessage: 'Inspector error' })
   expect(JSON.stringify(instance.render())).toContain('Inspector error')
+})
+
+test('renders parsing before a pending parse finishes and ignores completion after disposal', async () => {
+  const { promise: parsePromise, resolve: resolveParsing } = Promise.withResolvers<typeof parsedHeapSnapshot>()
+  const { promise: started, resolve: parsingStarted } = Promise.withResolvers<void>()
+  const requestRerender = jest.fn(async () => {})
+  const instance = await createInstanceWithDependencies(
+    { ...context, requestRerender },
+    {
+      getPreference: async () => false,
+      now: () => 0,
+      parseHeapSnapshot: () => {
+        parsingStarted()
+        return parsePromise
+      },
+      readFileAsBlob: async () => new Blob([heapSnapshot]),
+    },
+  )
+
+  expect(instance.render().some((node) => node.text === 'Parsing Heapsnapshot…')).toBe(true)
+  await started
+  instance.dispose?.()
+  resolveParsing(parsedHeapSnapshot)
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+
+  expect(instance.getComponentState()).toEqual({ loading: true })
+  expect(requestRerender).not.toHaveBeenCalled()
+})
+
+test('replaces the parsing state with results and requests a rerender', async () => {
+  const { promise: parsePromise, resolve: resolveParsing } = Promise.withResolvers<typeof parsedHeapSnapshot>()
+  const { promise: started, resolve: parsingStarted } = Promise.withResolvers<void>()
+  const requestRerender = jest.fn(async () => {})
+  const instance = await createInstanceWithDependencies(
+    { ...context, requestRerender },
+    {
+      getPreference: async () => false,
+      now: () => 0,
+      parseHeapSnapshot: () => {
+        parsingStarted()
+        return parsePromise
+      },
+      readFileAsBlob: async () => new Blob([heapSnapshot]),
+    },
+  )
+
+  expect(instance.render().some((node) => node.text === 'Parsing Heapsnapshot…')).toBe(true)
+  await started
+  resolveParsing(parsedHeapSnapshot)
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+
+  expect(instance.getComponentState()).toMatchObject({ summary: parsedHeapSnapshot.summary })
+  expect(requestRerender).toHaveBeenCalledTimes(1)
 })
