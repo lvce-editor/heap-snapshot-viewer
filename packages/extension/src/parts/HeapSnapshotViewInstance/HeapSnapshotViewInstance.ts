@@ -16,7 +16,7 @@ import type {
 } from '../HeapSnapshot/HeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import { parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
-import { render, renderError } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
+import { render, renderError, renderLoading } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
 export interface HeapSnapshotViewState {
   readonly aggregatePage: number
@@ -30,7 +30,7 @@ export interface HeapSnapshotViewState {
   readonly view: 'constructors' | 'statistics'
 }
 
-export type HeapSnapshotComponentState = HeapSnapshotViewState | { readonly errorMessage: string }
+export type HeapSnapshotComponentState = HeapSnapshotViewState | { readonly errorMessage: string } | { readonly loading: true }
 
 interface HeapSnapshotViewContext extends ViewContext {
   readonly uri?: string
@@ -109,123 +109,140 @@ const measure = async <T>(
   return result
 }
 
-const createErrorInstance = (uri: string, error: unknown): HeapSnapshotViewInstance => {
-  let message =
-    error instanceof Error ? error.message : 'The heap snapshot could not be processed because its data is inconsistent.'
-  return {
-    dispose(): void {},
-    getComponentState(): HeapSnapshotComponentState {
-      return { errorMessage: message }
-    },
-    render(): readonly VirtualDomNode[] {
-      return renderError(message)
-    },
-    saveState(): HeapSnapshotSavedState {
-      return { uri }
-    },
-    setComponentState(state: HeapSnapshotComponentState): void {
-      if (!('errorMessage' in state)) {
-        throw new Error('Expected heap snapshot error state')
-      }
-      message = state.errorMessage
-    },
-  }
-}
-
 export const createInstanceWithDependencies = async (
   context: HeapSnapshotViewContext | undefined,
   dependencies: HeapSnapshotViewDependencies,
 ): Promise<HeapSnapshotViewInstance> => {
   const savedState = getSavedState(context)
   const uri = getUri(context, savedState)
-  const timings: HeapSnapshotTiming[] = []
-  const showTimings = (await dependencies.getPreference(ShowTimingsSetting)) === true
+  let state: HeapSnapshotComponentState = { loading: true }
+  let disposed = false
+  const instance: HeapSnapshotViewInstance = {
+    dispose(): void {
+      disposed = true
+    },
+    getComponentState(): HeapSnapshotComponentState {
+      return state
+    },
+    render(): readonly VirtualDomNode[] {
+      if ('loading' in state) {
+        return renderLoading()
+      }
+      if ('errorMessage' in state) {
+        return renderError(state.errorMessage)
+      }
+      return render({
+        ...state,
+        aggregates: FilterAggregates.filterAggregates([...state.aggregates], state.filterValue),
+      })
+    },
+    saveState(): HeapSnapshotSavedState {
+      return {
+        filterValue: 'filterValue' in state ? state.filterValue : getFilterValue(savedState),
+        uri,
+        view: 'view' in state ? state.view : getView(savedState),
+      }
+    },
+    setComponentState(newState: HeapSnapshotComponentState): void {
+      if ('loading' in newState) {
+        throw new Error('Expected heap snapshot state')
+      }
+      state = newState
+    },
+  }
 
-  try {
-    const blob = await measure('read-file', () => dependencies.readFileAsBlob(uri), dependencies.now, timings)
-    const parsed = await dependencies.parseHeapSnapshot(blob)
-    let state: HeapSnapshotViewState = {
-      aggregatePage: 0,
-      aggregates: parsed.aggregates,
-      expandedNames: [],
-      filterValue: getFilterValue(savedState),
-      memoryByType: parsed.memoryByType,
-      showTimings,
-      summary: parsed.summary,
-      timings: [...timings, ...parsed.timings],
-      view: getView(savedState),
+  const load = async (): Promise<void> => {
+    const timings: HeapSnapshotTiming[] = []
+    try {
+      const preferencePromise = dependencies.getPreference(ShowTimingsSetting)
+      const blobPromise = measure('read-file', () => dependencies.readFileAsBlob(uri), dependencies.now, timings)
+      const [preference, blob] = await Promise.all([preferencePromise, blobPromise])
+      if (disposed) {
+        return
+      }
+      const showTimings = preference === true
+      const parsed = await dependencies.parseHeapSnapshot(blob)
+      if (disposed) {
+        return
+      }
+      state = {
+        aggregatePage: 0,
+        aggregates: parsed.aggregates,
+        expandedNames: [],
+        filterValue: getFilterValue(savedState),
+        memoryByType: parsed.memoryByType,
+        showTimings,
+        summary: parsed.summary,
+        timings: [...timings, ...parsed.timings],
+        view: getView(savedState),
+      }
+    } catch (error) {
+      if (!disposed) {
+        state = {
+          errorMessage:
+            error instanceof Error ? error.message : 'The heap snapshot could not be processed because its data is inconsistent.',
+        }
+      }
     }
+    if (!disposed) {
+      try {
+        await context?.requestRerender?.()
+      } catch {
+        // The view may have been closed while processing was in progress.
+      }
+    }
+  }
 
-    return {
-      dispose(): void {},
-      getComponentState(): HeapSnapshotComponentState {
-        return state
-      },
-      handleEvent(event: Readonly<ViewEvent>): void {
-        if (event.type === 'click' && (event.name === 'view:constructors' || event.name === 'view:statistics')) {
-          state = {
-            ...state,
-            view: event.name === 'view:statistics' ? 'statistics' : 'constructors',
-          }
-          return
-        }
-        if (event.type === 'click' && event.name === 'previous-page') {
-          state = {
-            ...state,
-            aggregatePage: Math.max(0, state.aggregatePage - 1),
-          }
-          return
-        }
-        if (event.type === 'click' && event.name === 'next-page') {
-          state = {
-            ...state,
-            aggregatePage: state.aggregatePage + 1,
-          }
-          return
-        }
-        if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
-          const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
-          const expandedNames = state.expandedNames.includes(aggregateName)
-            ? state.expandedNames.filter((name) => name !== aggregateName)
-            : [...state.expandedNames, aggregateName]
-          state = {
-            ...state,
-            expandedNames,
-          }
-          return
-        }
-        if (event.type !== 'input' || event.name !== 'filter') {
-          return
-        }
-        const filterValue = typeof event.value === 'string' ? event.value : ''
+  void load()
+
+  return {
+    ...instance,
+    handleEvent(event: Readonly<ViewEvent>): void {
+      if (!('aggregatePage' in state)) {
+        return
+      }
+      if (event.type === 'click' && (event.name === 'view:constructors' || event.name === 'view:statistics')) {
         state = {
           ...state,
-          aggregatePage: 0,
-          filterValue,
+          view: event.name === 'view:statistics' ? 'statistics' : 'constructors',
         }
-      },
-      render(): readonly VirtualDomNode[] {
-        return render({
+        return
+      }
+      if (event.type === 'click' && event.name === 'previous-page') {
+        state = {
           ...state,
-          aggregates: FilterAggregates.filterAggregates([...state.aggregates], state.filterValue),
-        })
-      },
-      saveState(): HeapSnapshotSavedState {
-        return {
-          filterValue: state.filterValue,
-          uri,
-          view: state.view,
+          aggregatePage: Math.max(0, state.aggregatePage - 1),
         }
-      },
-      setComponentState(newState: HeapSnapshotComponentState): void {
-        if ('errorMessage' in newState) {
-          throw new Error('Expected heap snapshot state')
+        return
+      }
+      if (event.type === 'click' && event.name === 'next-page') {
+        state = {
+          ...state,
+          aggregatePage: state.aggregatePage + 1,
         }
-        state = newState
-      },
-    }
-  } catch (error) {
-    return createErrorInstance(uri, error)
+        return
+      }
+      if (event.type === 'click' && event.name?.startsWith(ToggleAggregatePrefix)) {
+        const aggregateName = event.name.slice(ToggleAggregatePrefix.length)
+        const expandedNames = state.expandedNames.includes(aggregateName)
+          ? state.expandedNames.filter((name) => name !== aggregateName)
+          : [...state.expandedNames, aggregateName]
+        state = {
+          ...state,
+          expandedNames,
+        }
+        return
+      }
+      if (event.type !== 'input' || event.name !== 'filter') {
+        return
+      }
+      const filterValue = typeof event.value === 'string' ? event.value : ''
+      state = {
+        ...state,
+        aggregatePage: 0,
+        filterValue,
+      }
+    },
   }
 }
 

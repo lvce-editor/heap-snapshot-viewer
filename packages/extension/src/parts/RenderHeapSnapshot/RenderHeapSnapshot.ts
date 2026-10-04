@@ -378,3 +378,11 @@ export const renderError = (message: string): readonly VirtualDomNode[] => {
   ])
   return flatten(root)
 }
+
+export const renderLoading = (): readonly VirtualDomNode[] => {
+  const message = node(VirtualDomElements.Div, { className: 'HeapSnapshotLoading', role: 'status' }, [
+    textNode('Parsing Heapsnapshot…'),
+  ])
+  const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView' }, [message])
+  return flatten(root)
+}
