@@ -144,7 +144,7 @@ export const createInstanceWithDependencies = async (
       }
     },
     setComponentState(newState: HeapSnapshotComponentState): void {
-      if ('errorMessage' in newState || 'loading' in newState) {
+      if ('loading' in newState) {
         throw new Error('Expected heap snapshot state')
       }
       state = newState
