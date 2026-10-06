@@ -379,10 +379,12 @@ export const renderError = (message: string): readonly VirtualDomNode[] => {
   return flatten(root)
 }
 
-export const renderLoading = (): readonly VirtualDomNode[] => {
-  const message = node(VirtualDomElements.Div, { className: 'HeapSnapshotLoading', role: 'status' }, [
-    textNode('Parsing Heapsnapshot…'),
-  ])
+export const renderLoading = (fileSize?: number): readonly VirtualDomNode[] => {
+  const children = [textNode('Parsing Heapsnapshot…')]
+  if (fileSize !== undefined) {
+    children.push(textNode(`File size: ${formatBytes(fileSize)}`))
+  }
+  const message = node(VirtualDomElements.Div, { className: 'HeapSnapshotLoading', role: 'status' }, children)
   const root = node(VirtualDomElements.Div, { className: 'HeapSnapshotView' }, [message])
   return flatten(root)
 }

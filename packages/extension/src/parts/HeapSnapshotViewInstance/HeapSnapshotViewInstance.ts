@@ -30,7 +30,8 @@ export interface HeapSnapshotViewState {
   readonly view: 'constructors' | 'statistics'
 }
 
-export type HeapSnapshotComponentState = HeapSnapshotViewState | { readonly errorMessage: string } | { readonly loading: true }
+export type HeapSnapshotComponentState =
+  HeapSnapshotViewState | { readonly errorMessage: string } | { readonly fileSize?: number; readonly loading: true }
 
 interface HeapSnapshotViewContext extends ViewContext {
   readonly uri?: string
@@ -126,7 +127,7 @@ export const createInstanceWithDependencies = async (
     },
     render(): readonly VirtualDomNode[] {
       if ('loading' in state) {
-        return renderLoading()
+        return renderLoading(state.fileSize)
       }
       if ('errorMessage' in state) {
         return renderError(state.errorMessage)
@@ -157,6 +158,15 @@ export const createInstanceWithDependencies = async (
       const preferencePromise = dependencies.getPreference(ShowTimingsSetting)
       const blobPromise = measure('read-file', () => dependencies.readFileAsBlob(uri), dependencies.now, timings)
       const [preference, blob] = await Promise.all([preferencePromise, blobPromise])
+      if (disposed) {
+        return
+      }
+      state = { fileSize: blob.size, loading: true }
+      try {
+        await context?.requestRerender?.()
+      } catch {
+        // The view may have been closed while processing was in progress.
+      }
       if (disposed) {
         return
       }
