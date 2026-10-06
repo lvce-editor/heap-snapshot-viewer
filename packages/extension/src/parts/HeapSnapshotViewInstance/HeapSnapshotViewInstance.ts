@@ -31,9 +31,7 @@ export interface HeapSnapshotViewState {
 }
 
 export type HeapSnapshotComponentState =
-  | HeapSnapshotViewState
-  | { readonly errorMessage: string }
-  | { readonly fileSize?: number; readonly loading: true }
+  HeapSnapshotViewState | { readonly errorMessage: string } | { readonly fileSize?: number; readonly loading: true }
 
 interface HeapSnapshotViewContext extends ViewContext {
   readonly uri?: string
