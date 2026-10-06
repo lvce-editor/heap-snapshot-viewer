@@ -278,14 +278,37 @@ test('renders parsing before a pending parse finishes and ignores completion aft
     },
   )
 
-  expect(instance.render().some((node) => node.text === 'Parsing Heapsnapshot…')).toBe(true)
   await started
+  const loadingDom = instance.render()
+  expect(loadingDom.some((node) => node.text === 'Parsing Heapsnapshot…')).toBe(true)
+  expect(loadingDom.some((node) => node.text === `File size: ${heapSnapshot.length} B`)).toBe(true)
+  expect(loadingDom.some((node) => node.role === 'status')).toBe(true)
   instance.dispose?.()
   resolveParsing(parsedHeapSnapshot)
   await new Promise<void>((resolve) => setTimeout(resolve, 0))
 
-  expect(instance.getComponentState()).toEqual({ loading: true })
-  expect(requestRerender).not.toHaveBeenCalled()
+  expect(instance.getComponentState()).toEqual({ fileSize: heapSnapshot.length, loading: true })
+  expect(requestRerender).toHaveBeenCalledTimes(1)
+})
+
+test('shows a zero-byte file size while parsing is pending', async () => {
+  const { promise: parsePromise, resolve: resolveParsing } = Promise.withResolvers<typeof parsedHeapSnapshot>()
+  const { promise: started, resolve: parsingStarted } = Promise.withResolvers<void>()
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: () => {
+      parsingStarted()
+      return parsePromise
+    },
+    readFileAsBlob: async () => new Blob(),
+  })
+
+  await started
+  expect(instance.getComponentState()).toEqual({ fileSize: 0, loading: true })
+  expect(instance.render().some((node) => node.text === 'File size: 0 B')).toBe(true)
+  resolveParsing(parsedHeapSnapshot)
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
 })
 
 test('replaces the parsing state with results and requests a rerender', async () => {
@@ -305,11 +328,11 @@ test('replaces the parsing state with results and requests a rerender', async ()
     },
   )
 
-  expect(instance.render().some((node) => node.text === 'Parsing Heapsnapshot…')).toBe(true)
   await started
+  expect(instance.render().some((node) => node.text === `File size: ${heapSnapshot.length} B`)).toBe(true)
   resolveParsing(parsedHeapSnapshot)
   await new Promise<void>((resolve) => setTimeout(resolve, 0))
 
   expect(instance.getComponentState()).toMatchObject({ summary: parsedHeapSnapshot.summary })
-  expect(requestRerender).toHaveBeenCalledTimes(1)
+  expect(requestRerender).toHaveBeenCalledTimes(2)
 })
