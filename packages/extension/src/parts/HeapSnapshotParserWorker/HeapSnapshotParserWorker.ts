@@ -64,6 +64,15 @@ export const parseHeapSnapshot = async (blob: Blob): Promise<ParsedHeapSnapshot>
   return (await analysisRpc.invoke('HeapSnapshotAnalysis.analyze', result.value)) as ParsedHeapSnapshot
 }
 
+export const getHeapSnapshotStrings = async (blob: Blob): Promise<readonly string[]> => {
+  const parserRpc = await getRpc('parser')
+  const strings = await parserRpc.invoke('HeapSnapshotParser.getStrings', blob)
+  if (!Array.isArray(strings) || strings.some((value) => typeof value !== 'string')) {
+    throw new Error('The heap snapshot parser returned invalid strings')
+  }
+  return strings
+}
+
 export const dispose = async (): Promise<void> => {
   const promises = [state.parserRpcPromise, state.analysisRpcPromise]
   state.parserRpcPromise = undefined

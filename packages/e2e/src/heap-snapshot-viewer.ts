@@ -31,15 +31,15 @@ const basicHeapSnapshot = JSON.stringify({
       ],
     },
   },
-  strings: ['(GC roots)', 'Widget', 'Controller', 'widget', 'controller'],
+  strings: ['(GC roots)', 'Widget', 'Controller', 'widget', 'controller', '', 'a', 'a', 'é', '😀', 'line\nbreak'],
 })
 
-export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace }) => {
+export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
-  await FileSystem.writeFile(`${tmpDir}/test.heapsnapshot`, basicHeapSnapshot)
+  await FileSystem.writeFile(`${tmpDir}/test with spaces.heapsnapshot`, basicHeapSnapshot)
   await Workspace.setPath(tmpDir)
 
-  await Main.openUri(`${tmpDir}/test.heapsnapshot`)
+  await Main.openUri(`${tmpDir}/test with spaces.heapsnapshot`)
 
   const view = Locator('.HeapSnapshotView')
   await expect(view).toBeVisible()
@@ -130,4 +130,50 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, Workspace 
   await constructorsTab.click()
   await expect(constructorTable).toBeVisible()
   await expect(filteredConstructors).toHaveCount(1)
+
+  const stringsTab = Locator('.HeapSnapshotViewTab').nth(2)
+  // eslint-disable-next-line e2e/no-direct-click -- The view selector is extension-local and has no shared page object.
+  await stringsTab.click()
+  const editor = Locator('.Editor')
+  await expect(editor).toBeVisible()
+  const stringRows = Locator('.EditorRow')
+  await expect(stringRows).toHaveCount(11)
+  const expectedStrings = [
+    '""',
+    '"a"',
+    '"a"',
+    '"é"',
+    '"😀"',
+    '"Widget"',
+    '"widget"',
+    '"(GC roots)"',
+    '"Controller"',
+    '"controller"',
+    '"line\\nbreak"',
+  ]
+  for (let index = 0; index < expectedStrings.length; index++) {
+    const stringRow = stringRows.nth(index)
+    await expect(stringRow).toHaveText(expectedStrings[index])
+  }
+  // Read-only providers reject persistence even though LVCE permits buffer edits.
+  await Editor.type('unsaved buffer edit')
+  await Main.save()
+
+  await Main.closeAllEditors()
+  const sourceUri = `${tmpDir}/test with spaces.heapsnapshot`
+  const stringsUri = `heapnapshot-strings:///${encodeURIComponent(sourceUri)}.json`
+  await Main.openUri(stringsUri)
+  await expect(editor).toBeVisible()
+  await expect(stringRows).toHaveCount(11)
+  const firstStringRow = stringRows.nth(0)
+  const lastStringRow = stringRows.nth(10)
+  await expect(firstStringRow).toHaveText('""')
+  await expect(lastStringRow).toHaveText('"line\\nbreak"')
+
+  await Main.closeAllEditors()
+  const malformedUri = `${tmpDir}/malformed.heapsnapshot`
+  await FileSystem.writeFile(malformedUri, 'not json')
+  await Main.openUri(`heapnapshot-strings:///${encodeURIComponent(malformedUri)}.json`)
+  const errorMessage = Locator('.TextEditorErrorMessage')
+  await expect(errorMessage).toHaveText('The file is not valid JSON. Check the file contents and try again.')
 }

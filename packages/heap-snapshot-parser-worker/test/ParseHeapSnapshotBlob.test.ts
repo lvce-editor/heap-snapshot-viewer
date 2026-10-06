@@ -1,4 +1,5 @@
 import { expect, test } from '@jest/globals'
+import { getHeapSnapshotStrings } from '../src/parts/CommandMap.ts'
 import { parseHeapSnapshotBlob } from '../src/parts/ParseHeapSnapshotBlob.ts'
 
 const snapshot = {
@@ -36,4 +37,10 @@ test('returns malformed input as a validation error', async () => {
     message: 'The file is not valid JSON. Check the file contents and try again.',
     type: 'validation-error',
   })
+})
+
+test('returns the snapshot string table through the get strings command', async () => {
+  const blob = new Blob([JSON.stringify(snapshot)])
+  const strings = await getHeapSnapshotStrings(blob)
+  expect(strings).toEqual(snapshot.strings)
 })

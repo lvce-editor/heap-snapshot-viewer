@@ -29,8 +29,9 @@
       "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"]
     }
   ],
-  "activation": ["onView:builtin.heap-snapshot-viewer"],
+  "activation": ["onFileSystem:heapnapshot-strings", "onView:builtin.heap-snapshot-viewer"],
   "languages": [],
+  "fileSystemProviders": [{ "id": "heapnapshot-strings" }],
   "views": [
     {
       "id": "builtin.heap-snapshot-viewer",

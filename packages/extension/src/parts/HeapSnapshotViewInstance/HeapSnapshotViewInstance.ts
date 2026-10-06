@@ -1,8 +1,8 @@
 import type { VirtualDomNode } from '@lvce-editor/virtual-dom-worker'
 import {
+  executeCommand,
   getPreference,
-  readFile,
-  readFileAsBlob,
+  showNotification,
   type ViewContext,
   type ViewEvent,
   type VirtualDomViewInstance,
@@ -16,6 +16,8 @@ import type {
 } from '../HeapSnapshot/HeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import { parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
+import { createHeapSnapshotStringsUri } from '../HeapSnapshotStrings/HeapSnapshotStrings.ts'
+import { readHeapSnapshotBlob } from '../ReadHeapSnapshotBlob/ReadHeapSnapshotBlob.ts'
 import { render, renderError, renderLoading } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
 export interface HeapSnapshotViewState {
@@ -61,13 +63,7 @@ const defaultDependencies: HeapSnapshotViewDependencies = {
   getPreference,
   now: (): number => performance.now(),
   parseHeapSnapshot,
-  readFileAsBlob: async (uri: string): Promise<Blob> => {
-    try {
-      return await readFileAsBlob(uri)
-    } catch {
-      return new Blob([await readFile(uri)])
-    }
-  },
+  readFileAsBlob: readHeapSnapshotBlob,
 }
 
 const ShowTimingsSetting = 'heapSnapshotViewer.showTimings'
@@ -216,6 +212,12 @@ export const createInstanceWithDependencies = async (
           ...state,
           view: event.name === 'view:statistics' ? 'statistics' : 'constructors',
         }
+        return
+      }
+      if (event.type === 'click' && event.name === 'view:strings') {
+        void executeCommand('Main.openUri', createHeapSnapshotStringsUri(uri)).catch(async (error) => {
+          await showNotification('error', error instanceof Error ? error.message : String(error))
+        })
         return
       }
       if (event.type === 'click' && event.name === 'previous-page') {

@@ -80,7 +80,7 @@ test('renders metadata, memory usage, sizes, and collapsed aggregate rows', () =
   expect(classNames).toContain('HeapSnapshotTable')
   expect(dom).toContainEqual({
     ariaLabel: 'Heap snapshot view',
-    childCount: 2,
+    childCount: 3,
     className: 'HeapSnapshotViewSelector',
     role: 'group',
     type: VirtualDomElements.Div,
