@@ -247,9 +247,19 @@ const renderViewSelector = (view: HeapSnapshotViewState['view']): TreeNode => {
     },
     [textNode('Statistics')],
   )
+  const strings = node(
+    VirtualDomElements.Button,
+    {
+      className: 'HeapSnapshotViewTab',
+      name: 'view:strings',
+      onClick: 'handleClick',
+    },
+    [textNode('Strings')],
+  )
   return node(VirtualDomElements.Div, { ariaLabel: 'Heap snapshot view', className: 'HeapSnapshotViewSelector', role: 'group' }, [
     constructors,
     statistics,
+    strings,
   ])
 }
 
