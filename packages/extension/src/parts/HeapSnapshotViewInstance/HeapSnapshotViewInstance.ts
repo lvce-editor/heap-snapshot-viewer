@@ -15,7 +15,7 @@ import type {
   ParsedHeapSnapshot,
 } from '../HeapSnapshot/HeapSnapshot.ts'
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
-import { parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
+import { acquire as acquireHeapSnapshotWorkers, parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
 import { createHeapSnapshotStringsUri } from '../HeapSnapshotStrings/HeapSnapshotStrings.ts'
 import { readHeapSnapshotBlob } from '../ReadHeapSnapshotBlob/ReadHeapSnapshotBlob.ts'
 import { render, renderError, renderLoading } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
@@ -55,7 +55,7 @@ export interface HeapSnapshotViewInstance extends VirtualDomViewInstance {
 export interface HeapSnapshotViewDependencies {
   readonly getPreference: (key: string) => Promise<unknown>
   readonly now: () => number
-  readonly parseHeapSnapshot: (blob: Blob) => Promise<ParsedHeapSnapshot>
+  readonly parseHeapSnapshot: (blob: Blob, signal?: AbortSignal) => Promise<ParsedHeapSnapshot>
   readonly readFileAsBlob: (uri: string) => Promise<Blob>
 }
 
@@ -114,9 +114,16 @@ export const createInstanceWithDependencies = async (
   const uri = getUri(context, savedState)
   let state: HeapSnapshotComponentState = { loading: true }
   let disposed = false
+  const abortController = new AbortController()
+  const releaseHeapSnapshotWorkers = acquireHeapSnapshotWorkers()
   const instance: HeapSnapshotViewInstance = {
     dispose(): void {
+      if (disposed) {
+        return
+      }
       disposed = true
+      abortController.abort()
+      releaseHeapSnapshotWorkers()
     },
     getComponentState(): HeapSnapshotComponentState {
       return state
@@ -167,7 +174,7 @@ export const createInstanceWithDependencies = async (
         return
       }
       const showTimings = preference === true
-      const parsed = await dependencies.parseHeapSnapshot(blob)
+      const parsed = await dependencies.parseHeapSnapshot(blob, abortController.signal)
       if (disposed) {
         return
       }

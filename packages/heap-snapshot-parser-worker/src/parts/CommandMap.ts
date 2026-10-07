@@ -1,3 +1,4 @@
+import * as DisposeWorker from './DisposeWorker/DisposeWorker.ts'
 import { parseHeapSnapshotBlob } from './ParseHeapSnapshotBlob.ts'
 
 export const getHeapSnapshotStrings = async (blob: Blob): Promise<readonly string[]> => {
@@ -11,4 +12,5 @@ export const getHeapSnapshotStrings = async (blob: Blob): Promise<readonly strin
 export const commandMap: Readonly<Record<string, unknown>> = {
   'HeapSnapshotParser.getStrings': getHeapSnapshotStrings,
   'HeapSnapshotParser.parseBlob': parseHeapSnapshotBlob,
+  'Worker.dispose': DisposeWorker.dispose,
 }
