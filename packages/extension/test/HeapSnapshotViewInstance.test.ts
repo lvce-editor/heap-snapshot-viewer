@@ -92,7 +92,7 @@ const createLoadedInstance = async (
 
 test('reads the heap snapshot and delegates parsing to the parser worker', async () => {
   const readFileAsBlob = jest.fn(async (_uri: string) => new Blob([heapSnapshot]))
-  const parseHeapSnapshot = jest.fn(async (_blob: Blob) => parsedHeapSnapshot)
+  const parseHeapSnapshot = jest.fn(async (_blob: Blob, _signal?: AbortSignal) => parsedHeapSnapshot)
   let time = 0
   const instance = await createLoadedInstance(context, {
     getPreference: async () => false,
@@ -102,7 +102,7 @@ test('reads the heap snapshot and delegates parsing to the parser worker', async
   })
 
   expect(readFileAsBlob).toHaveBeenCalledWith('/workspace/test.heapsnapshot')
-  expect(parseHeapSnapshot).toHaveBeenCalledWith(expect.any(Blob))
+  expect(parseHeapSnapshot).toHaveBeenCalledWith(expect.any(Blob), expect.any(AbortSignal))
   const dom = instance.render()
   expect(dom.some((node) => node.text === 'Widget')).toBe(true)
   expect(dom.some((node) => node.text === 'Controller')).toBe(true)
@@ -289,6 +289,30 @@ test('renders parsing before a pending parse finishes and ignores completion aft
 
   expect(instance.getComponentState()).toEqual({ fileSize: heapSnapshot.length, loading: true })
   expect(requestRerender).toHaveBeenCalledTimes(1)
+})
+
+test('aborts parsing and releases ownership when a loading view is closed', async () => {
+  const { promise: parsePromise, resolve: resolveParsing } = Promise.withResolvers<typeof parsedHeapSnapshot>()
+  const { promise: started, resolve: parsingStarted } = Promise.withResolvers<void>()
+  let signal: AbortSignal | undefined
+  const instance = await createInstanceWithDependencies(context, {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot: (_blob, parseSignal) => {
+      signal = parseSignal
+      parsingStarted()
+      return parsePromise
+    },
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
+  })
+
+  await started
+  instance.dispose?.()
+  instance.dispose?.()
+  expect(signal?.aborted).toBe(true)
+  resolveParsing(parsedHeapSnapshot)
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  expect(instance.getComponentState()).toEqual({ fileSize: heapSnapshot.length, loading: true })
 })
 
 test('shows a zero-byte file size while parsing is pending', async () => {
