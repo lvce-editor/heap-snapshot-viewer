@@ -47,11 +47,14 @@ const compareStrings = (a: SizedString, b: SizedString): number => {
 }
 
 export const formatHeapSnapshotStrings = (strings: readonly string[]): string =>
-  strings
-    .map((value) => ({ length: [...value].length, value }))
-    .sort(compareStrings)
-    .map(({ value }) => JSON.stringify(value))
-    .join('\n')
+  JSON.stringify(
+    strings
+      .map((value) => ({ length: [...value].length, value }))
+      .sort(compareStrings)
+      .map(({ value }) => value),
+    null,
+    2,
+  )
 
 export const createHeapSnapshotStringsFileSystemProvider = () => ({
   id: scheme,

@@ -137,7 +137,11 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Wo
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
   const stringRows = Locator('.EditorRow')
-  await expect(stringRows).toHaveCount(11)
+  await expect(stringRows).toHaveCount(13)
+  const openingBracket = stringRows.nth(0)
+  const closingBracket = stringRows.nth(12)
+  await expect(openingBracket).toHaveText('[')
+  await expect(closingBracket).toHaveText(']')
   const expectedStrings = [
     '""',
     '"a"',
@@ -152,8 +156,9 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Wo
     '"line\\nbreak"',
   ]
   for (let index = 0; index < expectedStrings.length; index++) {
-    const stringRow = stringRows.nth(index)
-    await expect(stringRow).toHaveText(expectedStrings[index])
+    const stringRow = stringRows.nth(index + 1)
+    const comma = index === expectedStrings.length - 1 ? '' : ','
+    await expect(stringRow).toHaveText(`  ${expectedStrings[index]}${comma}`)
   }
   // Read-only providers reject persistence even though LVCE permits buffer edits.
   await Editor.type('unsaved buffer edit')
@@ -164,11 +169,11 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Wo
   const stringsUri = `heapnapshot-strings:///${encodeURIComponent(sourceUri)}.json`
   await Main.openUri(stringsUri)
   await expect(editor).toBeVisible()
-  await expect(stringRows).toHaveCount(11)
-  const firstStringRow = stringRows.nth(0)
-  const lastStringRow = stringRows.nth(10)
-  await expect(firstStringRow).toHaveText('""')
-  await expect(lastStringRow).toHaveText('"line\\nbreak"')
+  await expect(stringRows).toHaveCount(13)
+  const firstStringRow = stringRows.nth(1)
+  const lastStringRow = stringRows.nth(11)
+  await expect(firstStringRow).toHaveText('  "",')
+  await expect(lastStringRow).toHaveText('  "line\\nbreak"')
 
   await Main.closeAllEditors()
   const malformedUri = `${tmpDir}/malformed.heapsnapshot`
