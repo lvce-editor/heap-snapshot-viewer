@@ -17,6 +17,7 @@ import type {
 import * as FilterAggregates from '../FilterAggregates/FilterAggregates.ts'
 import { acquire as acquireHeapSnapshotWorkers, parseHeapSnapshot } from '../HeapSnapshotParserWorker/HeapSnapshotParserWorker.ts'
 import { createHeapSnapshotStringsUri } from '../HeapSnapshotStrings/HeapSnapshotStrings.ts'
+import * as ParsedHeapSnapshotCache from '../ParsedHeapSnapshotCache/ParsedHeapSnapshotCache.ts'
 import { readHeapSnapshotBlob } from '../ReadHeapSnapshotBlob/ReadHeapSnapshotBlob.ts'
 import { render, renderError, renderLoading } from '../RenderHeapSnapshot/RenderHeapSnapshot.ts'
 
@@ -68,6 +69,16 @@ const defaultDependencies: HeapSnapshotViewDependencies = {
 
 const ShowTimingsSetting = 'heapSnapshotViewer.showTimings'
 const ToggleAggregatePrefix = 'toggle-aggregate:'
+
+const getFingerprint = async (blob: Blob): Promise<string | undefined> => {
+  try {
+    const digest = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer())
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
+  } catch {
+    // Cache failures must not prevent opening a heap snapshot.
+    return undefined
+  }
+}
 
 const getSavedState = (context: HeapSnapshotViewContext | undefined): HeapSnapshotSavedState => {
   if (!context?.state || typeof context.state !== 'object') {
@@ -174,9 +185,14 @@ export const createInstanceWithDependencies = async (
         return
       }
       const showTimings = preference === true
-      const parsed = await dependencies.parseHeapSnapshot(blob, abortController.signal)
+      const fingerprint = await getFingerprint(blob)
+      const cached = fingerprint ? ParsedHeapSnapshotCache.get(uri, fingerprint) : undefined
+      const parsed = cached ?? (await dependencies.parseHeapSnapshot(blob, abortController.signal))
       if (disposed) {
         return
+      }
+      if (fingerprint && !cached) {
+        ParsedHeapSnapshotCache.set(uri, fingerprint, parsed)
       }
       state = {
         aggregatePage: 0,
