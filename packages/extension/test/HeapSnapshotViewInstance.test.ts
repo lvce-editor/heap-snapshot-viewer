@@ -1,7 +1,8 @@
 import type { ViewContext } from '@lvce-editor/api'
-import { expect, jest, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import { HeapSnapshotValidationError } from '../src/parts/HeapSnapshotValidationError/HeapSnapshotValidationError.ts'
 import { createInstanceWithDependencies } from '../src/parts/HeapSnapshotViewInstance/HeapSnapshotViewInstance.ts'
+import * as ParsedHeapSnapshotCache from '../src/parts/ParsedHeapSnapshotCache/ParsedHeapSnapshotCache.ts'
 
 const heapSnapshot = JSON.stringify({
   edges: [2, 3, 7, 2, 4, 14],
@@ -86,9 +87,15 @@ const createLoadedInstance = async (
   dependencies: Parameters<typeof createInstanceWithDependencies>[1],
 ) => {
   const instance = await createInstanceWithDependencies(instanceContext, dependencies)
-  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  for (let attempt = 0; attempt < 100 && 'loading' in instance.getComponentState(); attempt++) {
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  }
   return instance
 }
+
+beforeEach(() => {
+  ParsedHeapSnapshotCache.clear()
+})
 
 test('reads the heap snapshot and delegates parsing to the parser worker', async () => {
   const readFileAsBlob = jest.fn(async (_uri: string) => new Blob([heapSnapshot]))
@@ -155,6 +162,29 @@ test('switches to statistics and back without reparsing, and saves the selected 
   expect(instance.render().some((node) => node.className === 'HeapSnapshotTable')).toBe(true)
   expect(parseHeapSnapshot).toHaveBeenCalledTimes(1)
   expect(instance.saveState()).toMatchObject({ view: 'constructors' })
+})
+
+test('reuses a parsed snapshot across recreated views and invalidates changed contents', async () => {
+  const parseHeapSnapshot = jest.fn(async () => parsedHeapSnapshot)
+  const dependencies = {
+    getPreference: async () => false,
+    now: () => 0,
+    parseHeapSnapshot,
+    readFileAsBlob: async () => new Blob([heapSnapshot]),
+  }
+  const first = await createLoadedInstance(context, dependencies)
+  first.dispose?.()
+  const second = await createLoadedInstance(context, dependencies)
+  expect(parseHeapSnapshot).toHaveBeenCalledTimes(1)
+  second.dispose?.()
+
+  const changedContext = context
+  const changed = await createLoadedInstance(changedContext, {
+    ...dependencies,
+    readFileAsBlob: async () => new Blob([`${heapSnapshot} `]),
+  })
+  expect(parseHeapSnapshot).toHaveBeenCalledTimes(2)
+  changed.dispose?.()
 })
 
 test('reads the timing preference and expands aggregate details', async () => {
